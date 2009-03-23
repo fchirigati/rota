@@ -1,0 +1,436 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./normaers_files/filelist.xml">
+<title>GUIA PARA A ESPECIFICAÇÃO DE REQUISITOS DE SOFTWARE</title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Antônio Cláudio</o:Author>
+  <o:LastAuthor>Antonio Claudio Gomez Sousa</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>30</o:TotalTime>
+  <o:LastPrinted>2006-07-27T17:09:00Z</o:LastPrinted>
+  <o:Created>2006-07-27T17:10:00Z</o:Created>
+  <o:LastSaved>2006-07-27T17:10:00Z</o:LastSaved>
+  <o:Pages>1</o:Pages>
+  <o:Words>323</o:Words>
+  <o:Characters>1846</o:Characters>
+  <o:Company>DEL-EE-UFRJ</o:Company>
+  <o:Version>9.3821</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:HyphenationZone>21</w:HyphenationZone>
+  <w:DoNotHyphenateCaps/>
+  <w:PunctuationKerning/>
+  <w:DrawingGridHorizontalSpacing>6 pt</w:DrawingGridHorizontalSpacing>
+  <w:DrawingGridVerticalSpacing>6 pt</w:DrawingGridVerticalSpacing>
+  <w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
+  <w:DisplayVerticalDrawingGridEvery>3</w:DisplayVerticalDrawingGridEvery>
+  <w:UseMarginsForDrawingGridOrigin/>
+  <w:Compatibility>
+   <w:FootnoteLayoutLikeWW8/>
+   <w:ShapeLayoutLikeWW8/>
+   <w:AlignTablesRowByRow/>
+   <w:ForgetLastTabAlignment/>
+   <w:LayoutRawTableWidth/>
+   <w:LayoutTableRowsApart/>
+  </w:Compatibility>
+ </w:WordDocument>
+</xml><![endif]-->
+<style>
+<!--
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:PT-BR;}
+p.MsoTitle, li.MsoTitle, div.MsoTitle
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:center;
+	mso-pagination:widow-orphan;
+	text-autospace:none;
+	font-size:14.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:PT-BR;
+	font-weight:bold;}
+@page Section1
+	{size:21.0cm 842.0pt;
+	margin:70.9pt 2.0cm 42.55pt 3.0cm;
+	mso-header-margin:35.45pt;
+	mso-footer-margin:35.45pt;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+@list l0
+	{mso-list-id:316030389;
+	mso-list-template-ids:-481672480;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:53.4pt;
+	mso-level-number-position:left;
+	margin-left:53.4pt;
+	text-indent:-18.0pt;
+	font-family:Symbol;}
+@list l0:level2
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2";
+	mso-level-tab-stop:71.4pt;
+	mso-level-number-position:left;
+	margin-left:71.4pt;
+	text-indent:-18.0pt;}
+@list l0:level3
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:107.4pt;
+	mso-level-number-position:left;
+	margin-left:107.4pt;
+	text-indent:-36.0pt;}
+@list l0:level4
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:125.4pt;
+	mso-level-number-position:left;
+	margin-left:125.4pt;
+	text-indent:-36.0pt;}
+@list l0:level5
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:161.4pt;
+	mso-level-number-position:left;
+	margin-left:161.4pt;
+	text-indent:-54.0pt;}
+@list l0:level6
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:179.4pt;
+	mso-level-number-position:left;
+	margin-left:179.4pt;
+	text-indent:-54.0pt;}
+@list l0:level7
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:215.4pt;
+	mso-level-number-position:left;
+	margin-left:215.4pt;
+	text-indent:-72.0pt;}
+@list l0:level8
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:233.4pt;
+	mso-level-number-position:left;
+	margin-left:233.4pt;
+	text-indent:-72.0pt;}
+@list l0:level9
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:269.4pt;
+	mso-level-number-position:left;
+	margin-left:269.4pt;
+	text-indent:-90.0pt;}
+@list l1
+	{mso-list-id:922497109;
+	mso-list-template-ids:-481672480;}
+@list l1:level1
+	{mso-level-tab-stop:18.0pt;
+	mso-level-number-position:left;
+	margin-left:18.0pt;
+	text-indent:-18.0pt;}
+@list l1:level2
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2";
+	mso-level-tab-stop:36.0pt;
+	mso-level-number-position:left;
+	margin-left:36.0pt;
+	text-indent:-18.0pt;}
+@list l1:level3
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:72.0pt;
+	mso-level-number-position:left;
+	margin-left:72.0pt;
+	text-indent:-36.0pt;}
+@list l1:level4
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:90.0pt;
+	mso-level-number-position:left;
+	margin-left:90.0pt;
+	text-indent:-36.0pt;}
+@list l1:level5
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:126.0pt;
+	mso-level-number-position:left;
+	margin-left:126.0pt;
+	text-indent:-54.0pt;}
+@list l1:level6
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:144.0pt;
+	mso-level-number-position:left;
+	margin-left:144.0pt;
+	text-indent:-54.0pt;}
+@list l1:level7
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:180.0pt;
+	mso-level-number-position:left;
+	margin-left:180.0pt;
+	text-indent:-72.0pt;}
+@list l1:level8
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:198.0pt;
+	mso-level-number-position:left;
+	margin-left:198.0pt;
+	text-indent:-72.0pt;}
+@list l1:level9
+	{mso-level-legal-format:yes;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:234.0pt;
+	mso-level-number-position:left;
+	margin-left:234.0pt;
+	text-indent:-90.0pt;}
+ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+<!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext="edit" spidmax="1026"/>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext="edit">
+  <o:idmap v:ext="edit" data="1"/>
+ </o:shapelayout></xml><![endif]-->
+</head>
+
+<body lang=EN-US style='tab-interval:35.4pt;text-justify-trim:punctuation'>
+
+<div class=Section1>
+
+<p class=MsoTitle><span lang=PT-BR style='font-size:12.0pt'>NORMA:
+ESPECIFICAÇÃO DE REQUISITOS DE SOFTWARE<o:p></o:p></span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span lang=PT-BR
+style='font-size:12.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:18.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level1 lfo1;tab-stops:list 18.0pt'><![if !supportLists]><b><span
+lang=PT-BR style='font-size:12.0pt'>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></b><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Introdução<o:p></o:p></span></b></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>1.1<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Finalidade</span></b><span
+lang=PT-BR style='font-size:12.0pt'> – Descrever a finalidade e a audiência
+para a qual é dirigida a ERS<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>1.2<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Escopo</span></b><span
+lang=PT-BR style='font-size:12.0pt'> – Informar o nome do software e descrever
+seus objetivos e benefícios<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>1.3<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Definições,
+Acrônimos e Abreviaturas</span></b><span lang=PT-BR style='font-size:12.0pt'> –
+Definir termos e siglas<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>1.4<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Referências
+</span></b><span lang=PT-BR style='font-size:12.0pt'>– Identificação dos
+documentos referenciados na ERS (titulo, data, responsável, versão, fonte)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>1.5<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Resumo</span></b><span
+lang=PT-BR style='font-size:12.0pt'> – Descrever o que segue no resto da ERS,
+principalmente seu item 3.1<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:18.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level1 lfo1;tab-stops:list 18.0pt'><![if !supportLists]><b><span
+lang=PT-BR style='font-size:12.0pt'>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span></b><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Descrição
+Geral<o:p></o:p></span></b></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>2.1<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Perspectiva
+do Produto</span></b><span lang=PT-BR style='font-size:12.0pt'> – Descrever se
+o aplicativo é independente de outros aplicativos ou se é dependente (neste
+caso como se dá essa dependência) ou se é parte de outro sistema (neste caso
+apresentar diagrama mostrando o sistema dentro do outro sistema, e as
+interfaces)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>2.2<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Funções do
+Produto</span></b><span lang=PT-BR style='font-size:12.0pt'> – Sumariar as
+principais funções<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>2.3<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Características
+do Usuário</span></b><span lang=PT-BR style='font-size:12.0pt'> – Descrever as
+características dos usuários (idade, cultura e se é usuário casual,
+intermitente ou permanente; esta descrição é importante para a análise da
+amigabilidade do sistema)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>2.4<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Restrições
+</span></b><span lang=PT-BR style='font-size:12.0pt'>– Descrever as limitações
+que influam no projeto como políticas regulatórias, limitações de hardware,
+interfaces com outros aplicativos, considerações de segurança ou confiabilidade<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>2.5<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Pressupostos
+e Dependências</span></b><span lang=PT-BR style='font-size:12.0pt'> – Descrever
+os pressupostos que, no caso de não ocorrerem, podem trazer impactos ao projeto<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>2.6<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'><span
+style="mso-spacerun: yes"> </span>Postergar Requisitos</span></b><span
+lang=PT-BR style='font-size:12.0pt'> – Identificar os requisitos que podem ser
+deixados para uma futura versão do software<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:18.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level1 lfo1;tab-stops:list 18.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Requisitos
+Específicos</span></b><span lang=PT-BR style='font-size:12.0pt'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><b><span
+lang=PT-BR style='font-size:12.0pt'>3.1<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span></b><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Interfaces
+Externas<o:p></o:p></span></b></p>
+
+<p class=MsoNormal style='margin-left:72.0pt;text-align:justify;text-indent:
+-36.0pt;mso-list:l1 level3 lfo1;tab-stops:list 72.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.1.1<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Interfaces
+dos Usuários</span></b><span lang=PT-BR style='font-size:12.0pt'> – Modelo e
+descrição das interfaces dos usuários<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:72.0pt;text-align:justify;text-indent:
+-36.0pt;mso-list:l1 level3 lfo1;tab-stops:list 72.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.1.2<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Interfaces
+de Hardware</span></b><span lang=PT-BR style='font-size:12.0pt'> - Interfaces
+com hardware, como em controle de automação de máquinas<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:72.0pt;text-align:justify;text-indent:
+-36.0pt;mso-list:l1 level3 lfo1;tab-stops:list 72.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.1.3<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Interfaces
+de Software</span></b><span lang=PT-BR style='font-size:12.0pt'> – Interface
+com outros softwares aplicativos<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:72.0pt;text-align:justify;text-indent:
+-36.0pt;mso-list:l1 level3 lfo1;tab-stops:list 72.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.1.4<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Interfaces
+de Comunicação</span></b><span lang=PT-BR style='font-size:12.0pt'> –
+Identificação das redes utilizadas pelo software para comunicação de dados<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.2<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Requisitos
+Funcionais</span></b><span lang=PT-BR style='font-size:12.0pt'> – Esta é a
+seção mais longa da ERS,<span style="mso-spacerun: yes">  </span>pois cada
+requisito funcional deve ser detalhadamente especificado. Essa especificação
+pode ser obtida usando-se uma ferramenta case para a análise<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:53.4pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l0 level1 lfo2;tab-stops:list 53.4pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=PT-BR style='font-size:12.0pt'>No caso de se
+utilizar a Análise Estruturada, esta seção pode ser apresentada por: DFD´s,
+Especificações de Processos, DER, DD e DTE<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:53.4pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l0 level1 lfo2;tab-stops:list 53.4pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span lang=PT-BR style='font-size:12.0pt'>No caso de se
+utilizar a Análise OO esta seção pode ser apresentada por: Diagrama de Casos de
+Uso, Especificação dos Casos de Uso, Diagrama de Classes, DD, Diagramas de
+Atividades e Diagramas de Estado<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.3<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Requisitos
+de Desempenho</span></b><span lang=PT-BR style='font-size:12.0pt'> – Requisitos
+especiais de desempenho, como tempo de resposta ou quantidade de usuários
+simultâneos<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.4<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Restrições
+de Projeto</span></b><span lang=PT-BR style='font-size:12.0pt'> – Limitações
+impostas por normas, escolhas de software ou hardware, etc<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><span
+lang=PT-BR style='font-size:12.0pt'>3.5<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Atributos</span></b><span
+lang=PT-BR style='font-size:12.0pt'> – Atributos de qualidade como
+amigabilidade, manutenível, confiabilidade, etc. Devem ser indicados todos os
+atributos que se aplicam ao software.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:36.0pt;text-align:justify;text-indent:
+-18.0pt;mso-list:l1 level2 lfo1;tab-stops:list 36.0pt'><![if !supportLists]><b><span
+lang=PT-BR style='font-size:12.0pt'>3.6<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span></b><![endif]><b><span lang=PT-BR style='font-size:12.0pt'>Outros
+Requisitos<o:p></o:p></span></b></p>
+
+<p class=MsoNormal style='text-align:justify'><span lang=PT-BR
+style='font-size:12.0pt'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='text-align:justify'><span lang=PT-BR
+style='font-size:12.0pt'>Esta norma de ERS é baseada na norma ANSI/IEEE 830
+simplificada. Para cada item há o número do item, seu título, e uma pequena
+descrição de seu conteúdo (que não deve constar da ERS).<o:p></o:p></span></p>
+
+</div>
+
+</body>
+
+</html>
