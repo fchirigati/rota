@@ -1,2 +1,0 @@
-. INTERFACES EXTERNAS seria, no nosso caso, a empresa controladora de tráfego, que poderia utilizar
-  nosso software?
