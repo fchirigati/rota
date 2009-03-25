@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSimulator", "TrafficSimulator\TrafficSimulator.csproj", "{EE716789-F207-4CAB-8A0D-BB4A77997DA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficAnalyzer", "TrafficAnalyzer\TrafficAnalyzer.csproj", "{82F563CE-3749-43AB-A152-5921F4C7387E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ROTA", "ROTA\ROTA.csproj", "{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE716789-F207-4CAB-8A0D-BB4A77997DA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE716789-F207-4CAB-8A0D-BB4A77997DA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE716789-F207-4CAB-8A0D-BB4A77997DA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE716789-F207-4CAB-8A0D-BB4A77997DA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82F563CE-3749-43AB-A152-5921F4C7387E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82F563CE-3749-43AB-A152-5921F4C7387E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82F563CE-3749-43AB-A152-5921F4C7387E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82F563CE-3749-43AB-A152-5921F4C7387E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
