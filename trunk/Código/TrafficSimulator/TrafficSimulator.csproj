@@ -34,6 +34,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -44,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Structures\FlowNode.cs" />
+    <Compile Include="Structures\Lane.cs" />
+    <Compile Include="Structures\Vehicle.cs" />
+    <Compile Include="Structures\MapEdge.cs" />
+    <Compile Include="Structures\MapNode.cs" />
+    <Compile Include="Structures\Vector.cs" />
     <Compile Include="TrafficSimulator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

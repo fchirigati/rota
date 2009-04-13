@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSimulator", "Traffic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficAnalyzer", "TrafficAnalyzer\TrafficAnalyzer.csproj", "{82F563CE-3749-43AB-A152-5921F4C7387E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ROTA", "ROTA\ROTA.csproj", "{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TEN", "TEN\TEN.csproj", "{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
