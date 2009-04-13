@@ -8,8 +8,8 @@
     <ProjectGuid>{FC0F9A15-A36D-4AD6-A931-68B31C5CA7A0}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ROTA</RootNamespace>
-    <AssemblyName>ROTA</AssemblyName>
+    <RootNamespace>TEN</RootNamespace>
+    <AssemblyName>TEN</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
@@ -72,14 +72,32 @@
     <Compile Include="Forms\FrmMain.Designer.cs">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\MapDrawer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\MapDrawer.Designer.cs">
+      <DependentUpon>MapDrawer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\NumberDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\NumberDialog.Designer.cs">
+      <DependentUpon>NumberDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ROTA.cs" />
+    <Compile Include="Util\Refresher.cs" />
+    <Compile Include="Structures\Enums.cs" />
+    <Compile Include="TEN.cs" />
     <EmbeddedResource Include="Forms\FrmMain.resx">
       <DependentUpon>FrmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\NumberDialog.resx">
+      <DependentUpon>NumberDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -148,6 +166,42 @@
       <Project>{EE716789-F207-4CAB-8A0D-BB4A77997DA6}</Project>
       <Name>TrafficSimulator</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\button-blue-pause.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\button-blue-play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\button-blue-stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Last.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Pause.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Cursor.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\objects-misc-gears.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Add Small.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

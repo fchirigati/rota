@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ROTA.Properties {
+namespace TEN.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ROTA.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ROTA.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TEN.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,90 @@ namespace ROTA.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Button_Add {
+            get {
+                object obj = ResourceManager.GetObject("Button Add", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Button_Add_Small {
+            get {
+                object obj = ResourceManager.GetObject("Button_Add_Small", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap button_blue_pause {
+            get {
+                object obj = ResourceManager.GetObject("button_blue_pause", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap button_blue_play {
+            get {
+                object obj = ResourceManager.GetObject("button_blue_play", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap button_blue_stop {
+            get {
+                object obj = ResourceManager.GetObject("button_blue_stop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Button_Last {
+            get {
+                object obj = ResourceManager.GetObject("Button_Last", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Button_Pause {
+            get {
+                object obj = ResourceManager.GetObject("Button_Pause", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Button_Play {
+            get {
+                object obj = ResourceManager.GetObject("Button_Play", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Button_Refresh {
+            get {
+                object obj = ResourceManager.GetObject("Button Refresh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Button_Stop {
+            get {
+                object obj = ResourceManager.GetObject("Button_Stop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Cursor {
+            get {
+                object obj = ResourceManager.GetObject("Cursor", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap objects_misc_gears {
+            get {
+                object obj = ResourceManager.GetObject("objects-misc-gears", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
