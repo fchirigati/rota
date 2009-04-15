@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using TrafficSimulator;
+using TEN;
 
-namespace TrafficSimulator.Structures
+namespace TEN.Structures
 {
 	/// <summary>
 	/// This class represents a lane.

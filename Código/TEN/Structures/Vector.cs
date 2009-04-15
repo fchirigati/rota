@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace TrafficSimulator.Structures
+namespace TEN.Structures
 {
 	/// <summary>
 	/// A struct that represents a bi-dimensional unitary vector.

@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace TrafficSimulator.Structures
+namespace TEN.Structures
 {
 	/// <summary>
 	/// This class represents a car.
@@ -106,6 +106,8 @@ namespace TrafficSimulator.Structures
 		/// </summary>
 		public Point[] GetPoints()
 		{
+			// TO-DO: Fazer método mais eficiente, guardando pontos anteriores,
+			// que só precise fazer soma de vetores [ou não...].
 			Point[] points = new Point[4];
 			Vector basePoint = lane.SourcePoint + position * lane.Pointer;
 			Vector baseVector = new Vector(lane.Pointer.X, lane.Pointer.Y);

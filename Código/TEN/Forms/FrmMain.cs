@@ -29,6 +29,15 @@ namespace TEN.Forms
 		{
 			get { return editionMode; }
 		}
+
+		private AppState state;
+		/// <summary>
+		/// Gets the state of the application.
+		/// </summary>
+		public AppState State
+		{
+			get { return state; }
+		}
 		#endregion
 
 		#region Constructors
@@ -51,8 +60,35 @@ namespace TEN.Forms
 		#endregion
 
 		#region Private Methods
-		private void SetState()
+		/// <summary>
+		/// Sets a new state to the application, making the necessary changes.
+		/// </summary>
+		/// <param name="newState">New state of the application.</param>
+		private void SetState(AppState newState)
 		{
+			if (state == newState)
+				return;
+
+			switch (newState)
+			{
+				case AppState.SimulationRunning:
+					break;
+
+				case AppState.SimulationPaused:
+					break;
+
+				case AppState.EditingPointer:
+					break;
+
+				case AppState.EditingNewRoad:
+					break;
+
+				case AppState.EditingNewTrafficLight:
+					break;
+
+				case AppState.Other:
+					break;
+			}
 		}
 
 		/// <summary>

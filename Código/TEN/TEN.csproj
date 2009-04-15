@@ -89,9 +89,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Util\Refresher.cs" />
+    <Compile Include="Structures\FlowNode.cs" />
+    <Compile Include="Structures\Lane.cs" />
+    <Compile Include="Structures\MapEdge.cs" />
+    <Compile Include="Structures\MapNode.cs" />
+    <Compile Include="Structures\Vector.cs" />
+    <Compile Include="Structures\Vehicle.cs" />
+    <Compile Include="ThreadManagers\Refresher.cs" />
     <Compile Include="Structures\Enums.cs" />
     <Compile Include="TEN.cs" />
+    <Compile Include="ThreadManagers\TrafficSimulator.cs" />
     <EmbeddedResource Include="Forms\FrmMain.resx">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -161,10 +168,6 @@
     <ProjectReference Include="..\TrafficAnalyzer\TrafficAnalyzer.csproj">
       <Project>{82F563CE-3749-43AB-A152-5921F4C7387E}</Project>
       <Name>TrafficAnalyzer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TrafficSimulator\TrafficSimulator.csproj">
-      <Project>{EE716789-F207-4CAB-8A0D-BB4A77997DA6}</Project>
-      <Name>TrafficSimulator</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

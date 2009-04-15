@@ -2,8 +2,8 @@
 using System.Threading;
 using System.Windows.Forms;
 using TEN.Forms;
-using TEN.Util;
-using TrafficSimulator;
+using TEN.ThreadManagers;
+using TEN;
 
 namespace TEN
 {

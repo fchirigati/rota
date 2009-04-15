@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 
-namespace TrafficSimulator.Structures
+namespace TEN.Structures
 {
 	/// <summary>
 	/// Node that generates a flow of vehicles.
@@ -60,15 +60,27 @@ namespace TrafficSimulator.Structures
 		{
 			if (counter > random.Next(10 * flow))
 			{
-				int lane = random.Next(InEdges[0].Lanes.Count);
+				int lane = random.Next(OutEdges[0].Lanes.Count);
+				List<Vehicle> vehicles = OutEdges[0].Lanes[lane].Vehicles;
 
-				lock (InEdges[0].Lanes[lane].Vehicles)
+				lock (vehicles)
 				{
-					InEdges[0].Lanes[lane].Vehicles.Add(
-						new Vehicle(30, 1, 1, 60, Color.White, InEdges[0].Lanes[lane]));
-				}
+					bool occupiedEntrance = false;
+					foreach (Vehicle vehicle in vehicles)
+					{
+						if (vehicle.Position < TENApp.simulator.SafetyDistance + vehicle.Length)
+						{
+							occupiedEntrance = true;
+							break;
+						}
+					}
 
-				counter = 0;
+					if (!occupiedEntrance)
+					{
+						vehicles.Add(new Vehicle(30, 1, 1, 60, Color.White, OutEdges[0].Lanes[lane]));
+						counter = 0;
+					}
+				}
 			}
 			else
 				counter += (float)simulationStep / 1000;

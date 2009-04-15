@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace TrafficSimulator.Structures
+namespace TEN.Structures
 {
 	/// <summary>
 	/// This class represents a node in the map.
@@ -21,11 +21,20 @@ namespace TrafficSimulator.Structures
 
 		private List<MapEdge> inEdges;
 		/// <summary>
-		/// List of edges that uses this node.
+		/// List of edges that enter this node.
 		/// </summary>
 		public List<MapEdge> InEdges
 		{
 			get { return inEdges; }
+		}
+
+		private List<MapEdge> outEdges;
+		/// <summary>
+		/// List of edges that exit this node.
+		/// </summary>
+		public List<MapEdge> OutEdges
+		{
+			get { return outEdges; }
 		}
 		#endregion
 
@@ -39,6 +48,7 @@ namespace TrafficSimulator.Structures
 		{
 			this.point = new Point(positionX, positionY);
 			this.inEdges = new List<MapEdge>();
+			this.outEdges = new List<MapEdge>();
 		}
 
 		/// <summary>
@@ -58,6 +68,7 @@ namespace TrafficSimulator.Structures
 			this.point.X = mapNode.Point.X;
 			this.point.Y = mapNode.Point.Y;
 			this.inEdges = mapNode.inEdges;
+			this.outEdges = mapNode.outEdges;
 		}
 		#endregion
 
