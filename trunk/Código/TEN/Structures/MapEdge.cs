@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using TrafficSimulator.Structures;
+using TEN.Structures;
 using System.Linq;
 using System.Text;
 
-namespace TrafficSimulator.Structures
+namespace TEN.Structures
 {
 	/// <summary>
 	/// This class represets a edge in the map.
@@ -110,7 +110,7 @@ namespace TrafficSimulator.Structures
 					foreach (Vehicle vehicle in lane.Vehicles)
 						SimulateVehicle(vehicle, simulationStep);
 
-					// Clear vehicles that reached a final node.
+					// Clear vehicles that should not be in this lane.
 					foreach (Vehicle vehicle in lane.ToBeRemoved)
 						lane.Vehicles.Remove(vehicle);
 					lane.ToBeRemoved.Clear();
@@ -135,14 +135,25 @@ namespace TrafficSimulator.Structures
 
 			if (vehicle.Position > length)
 			{
-				if (toNode.InEdges.Count == 1)
+				vehicle.Lane.ToBeRemoved.Add(vehicle);
+				if (toNode.OutEdges.Count == 0)
 				{
 					// A final node has been reached.
-					vehicle.Lane.ToBeRemoved.Add(vehicle);
 				}
 				else
 				{
 					// Vehicle reached other edge.
+					// TO-DO: Curva suave.
+					int lane = vehicle.Lane.LaneNumber;
+					if (toNode.OutEdges[0].lanes.Count < lane)
+						lane = toNode.OutEdges[0].lanes.Count;
+
+					lock (toNode.OutEdges[0].lanes[lane - 1].Vehicles)
+					{
+						vehicle.Position = 0;
+						vehicle.Lane = toNode.OutEdges[0].lanes[lane - 1];
+						toNode.OutEdges[0].lanes[lane - 1].Vehicles.Add(vehicle);
+					}
 				}
 			}
 		}

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using TEN.Structures;
-using TrafficSimulator;
-using TrafficSimulator.Structures;
+using TEN;
+using TEN.Structures;
 using System.Threading;
 
 namespace TEN.Forms
@@ -22,6 +22,7 @@ namespace TEN.Forms
 
 		private readonly Pen penRoad;
 		private readonly Pen penRoadContour;
+		private readonly Pen penVehicleContour;
 		private readonly Pen penLaneSeparator;
 		private readonly Pen penRoadSketch;
 		private readonly Pen penNode;
@@ -67,6 +68,7 @@ namespace TEN.Forms
 
 			this.penRoad = new Pen(colorRoad, Simulator.LaneWidth);
 			this.penRoadContour = new Pen(Color.Black, 2);
+			this.penVehicleContour = new Pen(Color.Black, 2);
 			this.penLaneSeparator = new Pen(Color.Yellow, 2);
 			this.penLaneSeparator.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
 			this.penRoadSketch = new Pen(Color.FromArgb(128, colorRoad), Simulator.LaneWidth);
@@ -105,7 +107,7 @@ namespace TEN.Forms
 		/// <summary>
 		/// Draws a road in the map based on a given edge.
 		/// </summary>
-		/// <param name="graphics">The Graphics object that will be used to draw the road.</param>
+		/// <param name="graphics">Graphics object that will be used to draw the road.</param>
 		/// <param name="edge">The edge that represents the road to be drawed.</param>
 		private void DrawRoad(Graphics graphics, MapEdge edge)
 		{
@@ -114,42 +116,40 @@ namespace TEN.Forms
 				graphics.DrawLine(penRoad, edge.Lanes[i].SourcePoint.ToPoint(),
 					edge.Lanes[i].DestinationPoint.ToPoint());
 
-				// Draws lanes separators.
 				if (i == 0)
+					// Draws roads contours.
 					graphics.DrawLine(penRoadContour,
 						edge.Lanes[i].UpperSourcePoint.ToPoint(),
 						edge.Lanes[i].UpperDestinationPoint.ToPoint());
 				else
+					// Draws lanes separators.
 					graphics.DrawLine(penLaneSeparator,
 						edge.Lanes[i].UpperSourcePoint.ToPoint(),
 						edge.Lanes[i].UpperDestinationPoint.ToPoint());
-
-				// Draw vehicles.
-				lock (edge.Lanes[i].Vehicles)
-				{
-					foreach (Vehicle vehicle in edge.Lanes[i].Vehicles)
-						DrawVehicle(graphics, vehicle);
-				}
 			}
 			graphics.DrawLine(penRoadContour,
 				edge.Lanes[edge.Lanes.Count - 1].LowerSourcePoint.ToPoint(),
 				edge.Lanes[edge.Lanes.Count - 1].LowerDestinationPoint.ToPoint());
 
-			// TO-DO: curvas
-			if (edge.FromNode.InEdges.Count > 1)
+			if (edge.FromNode.OutEdges.Count > 1)
 			{
-				//graphics.DrawLine(penRoadContour, );
-				graphics.FillEllipse(brushRoad, edge.FromNode.Point.X - Simulator.LaneWidth / 2,
-					edge.FromNode.Point.Y - Simulator.LaneWidth / 2,
-					Simulator.LaneWidth, Simulator.LaneWidth);
+				// TO-DO: curvas
 			}
+		}
 
-			if (edge.ToNode.InEdges.Count > 1)
-			{
-				graphics.FillEllipse(brushRoad, edge.ToNode.Point.X - Simulator.LaneWidth / 2,
-					edge.ToNode.Point.Y - Simulator.LaneWidth / 2,
-					Simulator.LaneWidth, Simulator.LaneWidth);
-			}
+		/// <summary>
+		/// Draws a the vehicles that are in the map.
+		/// </summary>
+		/// <param name="graphics">Graphics object that will be used to draw the vehicles.</param>
+		private void DrawVehicles(Graphics graphics)
+		{
+			foreach (MapEdge edge in TENApp.simulator.Edges)
+				foreach (Lane lane in edge.Lanes)
+					lock (lane.Vehicles)
+					{
+						foreach (Vehicle vehicle in lane.Vehicles)
+							DrawVehicle(graphics, vehicle);
+					}
 		}
 
 		/// <summary>
@@ -159,7 +159,7 @@ namespace TEN.Forms
 		/// <param name="vehicle">The vehicle object to be drawed.</param>
 		private void DrawVehicle(Graphics graphics, Vehicle vehicle)
 		{
-			graphics.DrawPolygon(penRoadContour, vehicle.GetPoints());
+			graphics.DrawPolygon(penVehicleContour, vehicle.GetPoints());
 			graphics.FillPolygon(new SolidBrush(vehicle.Color), vehicle.GetPoints());
 		}
 
@@ -201,7 +201,7 @@ namespace TEN.Forms
 
 						MapEdge mapEdge = new MapEdge(numberDialog.Response, from, to);
 
-						from.InEdges.Add(mapEdge);
+						from.OutEdges.Add(mapEdge);
 						to.InEdges.Add(mapEdge);
 						TENApp.simulator.Nodes.Add(from);
 						TENApp.simulator.Nodes.Add(to);
@@ -209,7 +209,8 @@ namespace TEN.Forms
 					}
 					else
 					{
-						// User cancelled (TO-DO).
+						// TO-DO
+						// User cancelled.
 					}
 				}
 
@@ -258,19 +259,15 @@ namespace TEN.Forms
 				DrawRoad(pe.Graphics, edge);
 			}
 
-			// Draw nodes.
-			if (hoveredNode != null && hoveredNode.Distance(mouseX, mouseY) > 10)
-				hoveredNode = null;
+			// DrawVehicles.
+			DrawVehicles(pe.Graphics);
 
+			// Draw nodes.
 			foreach (MapNode node in TENApp.simulator.Nodes)
 			{
-				if (node == hoveredNode ||
-					(hoveredNode == null && node.Distance(mouseX, mouseY) < 10))
-				{
-					hoveredNode = node;
+				if (hoveredNode == node)
 					pe.Graphics.DrawEllipse(penHoverNode,
 						node.Point.X - 5, node.Point.Y - 5, 10, 10);
-				}
 				else
 					pe.Graphics.DrawEllipse(penNode,
 						node.Point.X - 5, node.Point.Y - 5, 10, 10);
@@ -310,6 +307,20 @@ namespace TEN.Forms
 			mouseX = e.X;
 			mouseY = e.Y;
 
+			if (hoveredNode == null || hoveredNode.Distance(mouseX, mouseY) > 12)
+			{
+				hoveredNode = null;
+				foreach (MapNode node in TENApp.simulator.Nodes)
+				{
+					if (node.Distance(mouseX, mouseY) < 12)
+					{
+						hoveredNode = node;
+						break;
+					}
+				}
+			}
+
+			// TO-DO: Refresh só se estiver em modo de edição.
 			Refresh();
 		}
 		#endregion
