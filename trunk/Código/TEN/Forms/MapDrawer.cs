@@ -389,8 +389,8 @@ namespace TEN.Forms
 		{
 			base.OnMouseMove(e);
 
-			mouseX = (int)((e.X - AutoScrollPosition.X)/zoom);
-			mouseY = (int)((e.Y - AutoScrollPosition.Y)/zoom);
+			mouseX = (int)((e.X) / zoom) - AutoScrollPosition.X;
+			mouseY = (int)((e.Y) / zoom) - AutoScrollPosition.Y;
 
 			if (hoveredNode == null || hoveredNode.Distance(mouseX, mouseY) > 12)
 			{
