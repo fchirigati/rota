@@ -165,12 +165,6 @@
     <None Include="media\traffic-lights-red.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TrafficAnalyzer\TrafficAnalyzer.csproj">
-      <Project>{82F563CE-3749-43AB-A152-5921F4C7387E}</Project>
-      <Name>TrafficAnalyzer</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="media\button-blue-pause.png" />
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +199,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="media\Button Add Small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\zoom_less.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\zoom_more.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

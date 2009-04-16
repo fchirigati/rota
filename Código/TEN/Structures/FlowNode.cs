@@ -58,7 +58,7 @@ namespace TEN.Structures
 		/// <param name="simulationStep">Simulation step value.</param>
 		public void SimulationStep(int simulationStep)
 		{
-			if (counter > random.Next(10 * flow))
+			if (counter * flow > random.Next(1000))
 			{
 				int lane = random.Next(OutEdges[0].Lanes.Count);
 				List<Vehicle> vehicles = OutEdges[0].Lanes[lane].Vehicles;

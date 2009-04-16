@@ -3,6 +3,7 @@ using System.Threading;
 using System.Windows.Forms;
 using TEN.Forms;
 using TEN.ThreadManagers;
+using TEN.Structures;
 using TEN;
 
 namespace TEN
@@ -39,6 +40,11 @@ namespace TEN
 		/// </summary>
 		static public volatile bool running;
 
+		/// <summary>
+		/// Gets the state of the application.
+		/// </summary>
+		static public volatile AppState state;
+
 		#region Thread References
 		/// <summary>
 		/// A reference to the thread where the program's Main method runs on.
@@ -71,6 +77,7 @@ namespace TEN
 				TENApp.frmMain.Show();
 				TENApp.running = true;
 				TENApp.shutdownStarted = false;
+				TENApp.state = AppState.EditingPointer;
 
 				TENApp.threadMain = Thread.CurrentThread;
 				TENApp.threadMain.Name = "MainThread";
