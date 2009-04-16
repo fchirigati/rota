@@ -64,7 +64,6 @@
 			this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-			this.mapDrawer1 = new TEN.Forms.MapDrawer();
 			this.toolStripSimulator = new System.Windows.Forms.ToolStrip();
 			this.btnStart = new System.Windows.Forms.ToolStripButton();
 			this.btnPause = new System.Windows.Forms.ToolStripButton();
@@ -77,6 +76,10 @@
 			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
 			this.btnInvertRoad = new System.Windows.Forms.ToolStripButton();
 			this.btnConfigure = new System.Windows.Forms.ToolStripButton();
+			this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+			this.btnZoomIn = new System.Windows.Forms.ToolStripButton();
+			this.btnZoomOut = new System.Windows.Forms.ToolStripButton();
+			this.mapDrawer = new TEN.Forms.MapDrawer();
 			this.menu.SuspendLayout();
 			this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
 			this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -337,7 +340,7 @@
 			// 
 			this.toolStripContainer1.ContentPanel.AutoScroll = true;
 			this.toolStripContainer1.ContentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.toolStripContainer1.ContentPanel.Controls.Add(this.mapDrawer1);
+			this.toolStripContainer1.ContentPanel.Controls.Add(this.mapDrawer);
 			this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(484, 181);
 			this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
@@ -367,15 +370,6 @@
 			this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
 			this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
 			// 
-			// mapDrawer1
-			// 
-			this.mapDrawer1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.mapDrawer1.Location = new System.Drawing.Point(0, 0);
-			this.mapDrawer1.Name = "mapDrawer1";
-			this.mapDrawer1.Size = new System.Drawing.Size(482, 179);
-			this.mapDrawer1.TabIndex = 0;
-			this.mapDrawer1.Text = "mapDrawer1";
-			// 
 			// toolStripSimulator
 			// 
 			this.toolStripSimulator.BackColor = System.Drawing.SystemColors.Control;
@@ -393,7 +387,10 @@
             this.btnNewTrafficLight,
             this.toolStripSeparator4,
             this.btnInvertRoad,
-            this.btnConfigure});
+            this.btnConfigure,
+            this.toolStripSeparator5,
+            this.btnZoomIn,
+            this.btnZoomOut});
 			this.toolStripSimulator.Location = new System.Drawing.Point(0, 24);
 			this.toolStripSimulator.Name = "toolStripSimulator";
 			this.toolStripSimulator.Padding = new System.Windows.Forms.Padding(0);
@@ -513,6 +510,43 @@
 			this.btnConfigure.Size = new System.Drawing.Size(34, 34);
 			this.btnConfigure.Text = "Configure";
 			// 
+			// toolStripSeparator5
+			// 
+			this.toolStripSeparator5.Name = "toolStripSeparator5";
+			this.toolStripSeparator5.Size = new System.Drawing.Size(6, 37);
+			// 
+			// btnZoomIn
+			// 
+			this.btnZoomIn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnZoomIn.Image = global::TEN.Properties.Resources.zoom_more;
+			this.btnZoomIn.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+			this.btnZoomIn.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.btnZoomIn.Name = "btnZoomIn";
+			this.btnZoomIn.Size = new System.Drawing.Size(34, 34);
+			this.btnZoomIn.Text = "Zoom In";
+			this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
+			// 
+			// btnZoomOut
+			// 
+			this.btnZoomOut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btnZoomOut.Image = global::TEN.Properties.Resources.zoom_less;
+			this.btnZoomOut.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+			this.btnZoomOut.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.btnZoomOut.Name = "btnZoomOut";
+			this.btnZoomOut.Size = new System.Drawing.Size(34, 34);
+			this.btnZoomOut.Text = "Zoom Out";
+			this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
+			// 
+			// mapDrawer
+			// 
+			this.mapDrawer.AutoScroll = true;
+			this.mapDrawer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.mapDrawer.Location = new System.Drawing.Point(0, 0);
+			this.mapDrawer.Name = "mapDrawer";
+			this.mapDrawer.Size = new System.Drawing.Size(482, 179);
+			this.mapDrawer.TabIndex = 0;
+			this.mapDrawer.Text = "mapDrawer";
+			// 
 			// FrmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -521,10 +555,10 @@
 			this.Controls.Add(this.toolStripContainer1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menu;
-			this.MinimumSize = new System.Drawing.Size(300, 300);
+			this.MinimumSize = new System.Drawing.Size(500, 300);
 			this.Name = "FrmMain";
 			this.Text = "Traffic Engine";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
 			this.menu.ResumeLayout(false);
 			this.menu.PerformLayout();
 			this.toolStripContainer1.BottomToolStripPanel.ResumeLayout(false);
@@ -581,7 +615,7 @@
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
 		private System.Windows.Forms.ToolStrip toolStripSimulator;
 		private System.Windows.Forms.ToolStripButton btnStart;
-		private MapDrawer mapDrawer1;
+		private MapDrawer mapDrawer;
 		private System.Windows.Forms.ToolStripButton btnPause;
 		private System.Windows.Forms.ToolStripButton btnStop;
 		private System.Windows.Forms.ToolStripButton btnRestart;
@@ -592,6 +626,9 @@
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 		private System.Windows.Forms.ToolStripButton btnInvertRoad;
 		private System.Windows.Forms.ToolStripButton btnConfigure;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+		private System.Windows.Forms.ToolStripButton btnZoomIn;
+		private System.Windows.Forms.ToolStripButton btnZoomOut;
 	}
 }
 

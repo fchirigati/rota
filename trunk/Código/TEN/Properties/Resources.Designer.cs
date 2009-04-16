@@ -213,5 +213,19 @@ namespace TEN.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        internal static System.Drawing.Bitmap zoom_less {
+            get {
+                object obj = ResourceManager.GetObject("zoom_less", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap zoom_more {
+            get {
+                object obj = ResourceManager.GetObject("zoom_more", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

@@ -25,9 +25,19 @@ namespace TEN
 
 		#region Fields
 		/// <summary>
-		/// States if this simulator should be running.
+		/// States if this simulator is running.
 		/// </summary>
 		private bool running;
+
+		private bool simulationStepDone;
+		/// <summary>
+		/// States if a simulation step has been done since the last time it was checked.
+		/// </summary>
+		public bool SimulationStepDone
+		{
+			get { return simulationStepDone; }
+			set { simulationStepDone = value; }
+		}
 
 		private int simulationStepTime;
 		/// <summary>
@@ -94,6 +104,7 @@ namespace TEN
 		public Simulator()
 		{
 			this.running = true;
+			this.simulationStepDone = false;
 			this.edges = new List<MapEdge>();
 			this.nodes = new List<MapNode>();
 			this.flowNodes = new List<FlowNode>();
@@ -112,6 +123,7 @@ namespace TEN
 			while (running)
 			{
 				SimulationStep();
+				simulationStepDone = true;
 				Thread.Sleep(simulationDelay);
 			}
 		}

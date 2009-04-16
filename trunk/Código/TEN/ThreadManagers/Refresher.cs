@@ -47,14 +47,18 @@ namespace TEN.ThreadManagers
 		{
 			while (running)
 			{
-				if (!TENApp.running || !TENApp.frmMain.Running)
+				if (!TENApp.running || !TENApp.frmMain.Running || !TENApp.simulator.SimulationStepDone)
+				{
+					Thread.Sleep(delay);
 					continue;
+				}
 
 				if (TENApp.frmMain.IsHandleCreated)
 				{
 					RefreshMethod d = TENApp.frmMain.Refresh;
 					TENApp.frmMain.BeginInvoke(d);
 				}
+				TENApp.simulator.SimulationStepDone = false;
 
 				Thread.Sleep(delay);
 			}

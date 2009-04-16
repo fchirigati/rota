@@ -29,15 +29,6 @@ namespace TEN.Forms
 		{
 			get { return editionMode; }
 		}
-
-		private AppState state;
-		/// <summary>
-		/// Gets the state of the application.
-		/// </summary>
-		public AppState State
-		{
-			get { return state; }
-		}
 		#endregion
 
 		#region Constructors
@@ -66,8 +57,10 @@ namespace TEN.Forms
 		/// <param name="newState">New state of the application.</param>
 		private void SetState(AppState newState)
 		{
-			if (state == newState)
+			if (TENApp.state == newState)
 				return;
+
+			TENApp.state = newState;
 
 			switch (newState)
 			{
@@ -111,39 +104,34 @@ namespace TEN.Forms
 		#endregion
 
 		#region Event Handlers
-		private void MainForm_FormClosing(object sender, EventArgs e)
-		{
-			TENApp.Shutdown();
-		}
-
 		private void btnPointer_Click(object sender, EventArgs e)
 		{
 			editionMode = EditorMode.Pointer;
-			mapDrawer1.ClearClickedPoints();
+			mapDrawer.ClearClickedPoints();
 			CheckButton(btnPointer);
 			UncheckButton(btnNewRoad);
 			UncheckButton(btnNewTrafficLight);
-			mapDrawer1.Refresh();
+			mapDrawer.Refresh();
 		}
 
 		private void btnNewRoad_Click(object sender, EventArgs e)
 		{
 			editionMode = EditorMode.NewRoad;
-			mapDrawer1.ClearClickedPoints();
+			mapDrawer.ClearClickedPoints();
 			UncheckButton(btnPointer);
 			CheckButton(btnNewRoad);
 			UncheckButton(btnNewTrafficLight);
-			mapDrawer1.Refresh();
+			mapDrawer.Refresh();
 		}
 
 		private void btnNewTrafficLight_Click(object sender, EventArgs e)
 		{
 			editionMode = EditorMode.NewTrafficLight;
-			mapDrawer1.ClearClickedPoints();
+			mapDrawer.ClearClickedPoints();
 			UncheckButton(btnPointer);
 			UncheckButton(btnNewRoad);
 			CheckButton(btnNewTrafficLight);
-			mapDrawer1.Refresh();
+			mapDrawer.Refresh();
 		}
 
 		private void btnStart_Click(object sender, EventArgs e)
@@ -158,11 +146,28 @@ namespace TEN.Forms
 			btnNewTrafficLight.Enabled = false;
 
 			editionMode = EditorMode.Pointer;
-			mapDrawer1.ClearClickedPoints();
+			mapDrawer.ClearClickedPoints();
 			CheckButton(btnPointer);
 			UncheckButton(btnNewRoad);
 			UncheckButton(btnNewTrafficLight);
-			mapDrawer1.Refresh();
+			mapDrawer.Refresh();
+		}
+
+		private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			TENApp.Shutdown();
+		}
+
+		private void btnZoomIn_Click(object sender, EventArgs e)
+		{
+			mapDrawer.Zoom += 0.1F;
+			mapDrawer.Refresh();
+		}
+
+		private void btnZoomOut_Click(object sender, EventArgs e)
+		{
+			mapDrawer.Zoom -= 0.1F;
+			mapDrawer.Refresh();
 		}
 		#endregion
 	}
