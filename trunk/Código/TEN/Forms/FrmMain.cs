@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Threading;
 using System.Drawing;
 using TEN.Structures;
 
@@ -20,15 +21,6 @@ namespace TEN.Forms
 		{
 			get { return running; }
 		}
-
-		private EditorMode editionMode;
-		/// <summary>
-		/// Gets the current edition mode.
-		/// </summary>
-		public EditorMode EditionMode
-		{
-			get { return editionMode; }
-		}
 		#endregion
 
 		#region Constructors
@@ -38,7 +30,6 @@ namespace TEN.Forms
 		public FrmMain()
 		{
 			this.running = false;
-			this.editionMode = EditorMode.Pointer;
 
 			InitializeComponent();
 
@@ -60,23 +51,80 @@ namespace TEN.Forms
 			if (TENApp.state == newState)
 				return;
 
+			mapDrawer.ClearClickedPoints();
 			TENApp.state = newState;
 
 			switch (newState)
 			{
 				case AppState.SimulationRunning:
+					mapDrawer.ClearClickedPoints();
+
+					CheckButton(btnPointer);
+					UncheckButton(btnNewRoad);
+					UncheckButton(btnNewTrafficLight);
+
+					btnNewRoad.Enabled = false;
+					btnNewTrafficLight.Enabled = false;
+					btnStart.Enabled = false;
+					btnPause.Enabled = true;
+					btnStop.Enabled = true;
+					btnRestart.Enabled = true;
+
+					TENApp.simulator.Start();
 					break;
 
 				case AppState.SimulationPaused:
+					if (TENApp.simulator.IsSimulating)
+						TENApp.simulator.Pause();
+
+					mapDrawer.ClearClickedPoints();
+
+					CheckButton(btnPointer);
+					UncheckButton(btnNewRoad);
+					UncheckButton(btnNewTrafficLight);
+
+					btnNewRoad.Enabled = false;
+					btnNewTrafficLight.Enabled = false;
+					btnStart.Enabled = true;
+					btnPause.Enabled = false;
+					btnStop.Enabled = true;
+					btnRestart.Enabled = true;
 					break;
 
 				case AppState.EditingPointer:
+					if (TENApp.simulator.IsSimulating)
+						TENApp.simulator.Stop();
+
+					mapDrawer.ClearClickedPoints();
+
+					CheckButton(btnPointer);
+					UncheckButton(btnNewRoad);
+					UncheckButton(btnNewTrafficLight);
+
+					btnPointer.Enabled = true;
+					btnNewRoad.Enabled = true;
+					btnNewTrafficLight.Enabled = true;
+					btnStart.Enabled = true;
+					btnPause.Enabled = false;
+					btnStop.Enabled = false;
+					btnRestart.Enabled = false;
+
+					mapDrawer.Refresh();
 					break;
 
 				case AppState.EditingNewRoad:
+					UncheckButton(btnPointer);
+					CheckButton(btnNewRoad);
+					UncheckButton(btnNewTrafficLight);
+					mapDrawer.Refresh();
 					break;
 
 				case AppState.EditingNewTrafficLight:
+					mapDrawer.ClearClickedPoints();
+					UncheckButton(btnPointer);
+					UncheckButton(btnNewRoad);
+					CheckButton(btnNewTrafficLight);
+					mapDrawer.Refresh();
 					break;
 
 				case AppState.Other:
@@ -106,51 +154,43 @@ namespace TEN.Forms
 		#region Event Handlers
 		private void btnPointer_Click(object sender, EventArgs e)
 		{
-			editionMode = EditorMode.Pointer;
-			mapDrawer.ClearClickedPoints();
-			CheckButton(btnPointer);
-			UncheckButton(btnNewRoad);
-			UncheckButton(btnNewTrafficLight);
-			mapDrawer.Refresh();
+			SetState(AppState.EditingPointer);
 		}
 
 		private void btnNewRoad_Click(object sender, EventArgs e)
 		{
-			editionMode = EditorMode.NewRoad;
-			mapDrawer.ClearClickedPoints();
-			UncheckButton(btnPointer);
-			CheckButton(btnNewRoad);
-			UncheckButton(btnNewTrafficLight);
-			mapDrawer.Refresh();
+			SetState(AppState.EditingNewRoad);
 		}
 
 		private void btnNewTrafficLight_Click(object sender, EventArgs e)
 		{
-			editionMode = EditorMode.NewTrafficLight;
-			mapDrawer.ClearClickedPoints();
-			UncheckButton(btnPointer);
-			UncheckButton(btnNewRoad);
-			CheckButton(btnNewTrafficLight);
-			mapDrawer.Refresh();
+			SetState(AppState.EditingNewTrafficLight);
 		}
 
 		private void btnStart_Click(object sender, EventArgs e)
 		{
-			TENApp.threadSimulator.Start();
-			btnStart.Enabled = false;
-			btnPause.Enabled = true;
-			btnStop.Enabled = true;
-			btnRestart.Enabled = true;
+			SetState(AppState.SimulationRunning);
+		}
 
-			btnNewRoad.Enabled = false;
-			btnNewTrafficLight.Enabled = false;
+		private void btnPause_Click(object sender, EventArgs e)
+		{
+			SetState(AppState.SimulationPaused);
+		}
 
-			editionMode = EditorMode.Pointer;
-			mapDrawer.ClearClickedPoints();
-			CheckButton(btnPointer);
-			UncheckButton(btnNewRoad);
-			UncheckButton(btnNewTrafficLight);
-			mapDrawer.Refresh();
+		private void btnStop_Click(object sender, EventArgs e)
+		{
+			SetState(AppState.EditingPointer);
+		}
+
+		private void btnRestart_Click(object sender, EventArgs e)
+		{
+			SetState(AppState.EditingPointer);
+			SetState(AppState.SimulationRunning);
+		}
+
+		private void FrmMain_Load(object sender, EventArgs e)
+		{
+			mapDrawer.AutoScrollPosition = new Point(5000, 5000);
 		}
 
 		private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -160,13 +200,17 @@ namespace TEN.Forms
 
 		private void btnZoomIn_Click(object sender, EventArgs e)
 		{
-			mapDrawer.Zoom += 0.1F;
+			if (mapDrawer.Zoom < 3)
+				mapDrawer.Zoom += 0.1F;
+
 			mapDrawer.Refresh();
 		}
 
 		private void btnZoomOut_Click(object sender, EventArgs e)
 		{
-			mapDrawer.Zoom -= 0.1F;
+			if (mapDrawer.Zoom > 0.1F)
+				mapDrawer.Zoom -= 0.1F;
+
 			mapDrawer.Refresh();
 		}
 		#endregion

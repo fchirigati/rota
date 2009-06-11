@@ -64,6 +64,7 @@
 			this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.mapDrawer = new TEN.Forms.MapDrawer();
 			this.toolStripSimulator = new System.Windows.Forms.ToolStrip();
 			this.btnStart = new System.Windows.Forms.ToolStripButton();
 			this.btnPause = new System.Windows.Forms.ToolStripButton();
@@ -79,7 +80,6 @@
 			this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
 			this.btnZoomIn = new System.Windows.Forms.ToolStripButton();
 			this.btnZoomOut = new System.Windows.Forms.ToolStripButton();
-			this.mapDrawer = new TEN.Forms.MapDrawer();
 			this.menu.SuspendLayout();
 			this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
 			this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -370,6 +370,18 @@
 			this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
 			this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
 			// 
+			// mapDrawer
+			// 
+			this.mapDrawer.AutoScroll = true;
+			this.mapDrawer.AutoScrollMinSize = new System.Drawing.Size(10000, 10000);
+			this.mapDrawer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.mapDrawer.Location = new System.Drawing.Point(0, 0);
+			this.mapDrawer.Name = "mapDrawer";
+			this.mapDrawer.Size = new System.Drawing.Size(482, 179);
+			this.mapDrawer.TabIndex = 0;
+			this.mapDrawer.Text = "mapDrawer";
+			this.mapDrawer.Zoom = 1F;
+			// 
 			// toolStripSimulator
 			// 
 			this.toolStripSimulator.BackColor = System.Drawing.SystemColors.Control;
@@ -420,6 +432,7 @@
 			this.btnPause.Size = new System.Drawing.Size(34, 34);
 			this.btnPause.Text = "Pause Simulation";
 			this.btnPause.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
 			// 
 			// btnStop
 			// 
@@ -431,6 +444,7 @@
 			this.btnStop.Size = new System.Drawing.Size(34, 34);
 			this.btnStop.Text = "Stop Simulation";
 			this.btnStop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
 			// 
 			// btnRestart
 			// 
@@ -442,6 +456,7 @@
 			this.btnRestart.Size = new System.Drawing.Size(34, 34);
 			this.btnRestart.Text = "Restart Simulation";
 			this.btnRestart.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+			this.btnRestart.Click += new System.EventHandler(this.btnRestart_Click);
 			// 
 			// toolStripSeparator1
 			// 
@@ -537,16 +552,6 @@
 			this.btnZoomOut.Text = "Zoom Out";
 			this.btnZoomOut.Click += new System.EventHandler(this.btnZoomOut_Click);
 			// 
-			// mapDrawer
-			// 
-			this.mapDrawer.AutoScroll = true;
-			this.mapDrawer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.mapDrawer.Location = new System.Drawing.Point(0, 0);
-			this.mapDrawer.Name = "mapDrawer";
-			this.mapDrawer.Size = new System.Drawing.Size(482, 179);
-			this.mapDrawer.TabIndex = 0;
-			this.mapDrawer.Text = "mapDrawer";
-			// 
 			// FrmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -558,6 +563,7 @@
 			this.MinimumSize = new System.Drawing.Size(500, 300);
 			this.Name = "FrmMain";
 			this.Text = "Traffic Engine";
+			this.Load += new System.EventHandler(this.FrmMain_Load);
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
 			this.menu.ResumeLayout(false);
 			this.menu.PerformLayout();

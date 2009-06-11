@@ -9,6 +9,13 @@ namespace TEN.Structures
 	/// </summary>
 	public class MapNode
 	{
+		#region Constants
+		/// <summary>
+		/// Value that represents a non-existant node.
+		/// </summary>
+		public const MapNode NoNode = null;
+		#endregion
+
 		#region Fields
 		private Point point;
 		/// <summary>
@@ -44,9 +51,9 @@ namespace TEN.Structures
 		/// </summary>
 		/// <param name="positionX">The X coordinate of the node.</param>
 		/// <param name="positionY">The Y coordinate of the node.</param>
-		public MapNode(int positionX, int positionY)
+		public MapNode(float positionX, float positionY)
 		{
-			this.point = new Point(positionX, positionY);
+			this.point = new Point((int)positionX, (int)positionY);
 			this.inEdges = new List<MapEdge>();
 			this.outEdges = new List<MapEdge>();
 		}
@@ -78,7 +85,7 @@ namespace TEN.Structures
 		/// </summary>
 		/// <param name="positionX">The X coordinate of the other point.</param>
 		/// <param name="positionY">The Y coordinate of the other point.</param>
-		public float Distance(int positionX, int positionY)
+		public float Distance(float positionX, float positionY)
 		{
 			return (float)Math.Sqrt((point.X - positionX) * (point.X - positionX)
 				+ (point.Y - positionY) * (point.Y - positionY));

@@ -19,6 +19,11 @@ namespace TEN.Forms
 		/// Number of extra pixels that bounds the map.
 		/// </summary>
 		private const int mapExtraBoundings = 150;
+
+		/// <summary>
+		/// Radius of the nodes.
+		/// </summary>
+		private const int nodeRadius = 5;
 		#endregion
 
 		#region Readonly Fields
@@ -46,12 +51,22 @@ namespace TEN.Forms
 		/// <summary>
 		/// Current mouse X coordinate.
 		/// </summary>
-		private int mouseX;
+		private float mouseX;
 
 		/// <summary>
-		/// Current moues Y coordinate.
+		/// Current mouse Y coordinate.
 		/// </summary>
-		private int mouseY;
+		private float mouseY;
+
+		/// <summary>
+		/// Adjusted mouse X coordinate.
+		/// </summary>
+		private float adjustedMouseX;
+
+		/// <summary>
+		/// Adjusted mouse Y coordinate.
+		/// </summary>
+		private float adjustedMouseY;
 
 		private int mapWidth;
 		/// <summary>
@@ -81,15 +96,25 @@ namespace TEN.Forms
 			set { zoom = value; }
 		}
 
+		private int snapOffset;
+		/// <summary>
+		/// Minimum distance from the mouse position to a near node to set it as hovered.
+		/// </summary>
+		public int SnapOffset
+		{
+			get { return snapOffset; }
+			set { snapOffset = value; }
+		}
+
 		/// <summary>
 		/// Reference to the current hovered map node. null if there are no hovered nodes.
 		/// </summary>
-		MapNode hoveredNode;
+		private MapNode hoveredNode;
 
 		/// <summary>
 		/// Reference to the current selected map node. null if there are no hovered nodes.
 		/// </summary>
-		MapNode selectedNode;
+		private MapNode selectedNode;
 
 		/// <summary>
 		/// List of temporary clicked points.
@@ -112,8 +137,9 @@ namespace TEN.Forms
 			this.penRoad = new Pen(colorRoad, Simulator.LaneWidth);
 			this.penRoadContour = new Pen(Color.Black, 2);
 			this.penVehicleContour = new Pen(Color.Black, 2);
-			this.penLaneSeparator = new Pen(Color.Yellow, 2);
-			this.penLaneSeparator.DashStyle = DashStyle.Dash;
+			this.penLaneSeparator = new Pen(Color.White, 2);
+			//this.penLaneSeparator.DashStyle = DashStyle.Custom;
+			this.penLaneSeparator.DashPattern = new float[]{5.0F, 5.0F};
 			this.penRoadSketch = new Pen(Color.FromArgb(128, colorRoad), Simulator.LaneWidth);
 			this.penNode = new Pen(colorNode, 1);
 			this.penSelectedNode = new Pen(colorSelectedNode, 1);
@@ -122,19 +148,23 @@ namespace TEN.Forms
 			this.brushRoad = new SolidBrush(colorRoad);
 			this.brushNode = new SolidBrush(Color.FromArgb(32, colorNode));
 			this.brushHoveredNode = new SolidBrush(Color.FromArgb(128, colorHoveredNode));
-			this.brushSelectedNode = new SolidBrush(colorSelectedNode);
+			this.brushSelectedNode = new SolidBrush(Color.FromArgb(32, colorSelectedNode));
 			#endregion
 
 			// Initialize fields.
-			this.mapWidth = 0;
-			this.mapHeight = 0;
+			this.adjustedMouseX = -1;
+			this.adjustedMouseY = -1;
+			this.mapWidth = 10000;
+			this.mapHeight = 10000;
 			this.zoom = 1;
-			this.hoveredNode = null;
-			this.selectedNode = null;
+			this.snapOffset = 12;
+			this.hoveredNode = MapNode.NoNode;
+			this.selectedNode = MapNode.NoNode;
 			this.clickedNodes = new List<MapNode>();
 
-			// Design method.
+			// Design methods.
 			InitializeComponent();
+			this.AutoScrollMinSize = new Size(this.mapWidth, this.mapHeight);
 
 			// Enable double buffer.
 			SetStyle(ControlStyles.UserPaint, true);
@@ -149,7 +179,8 @@ namespace TEN.Forms
 		/// </summary>
 		public void ClearClickedPoints()
 		{
-			this.clickedNodes.Clear();
+			clickedNodes.Clear();
+			selectedNode = MapNode.NoNode;
 		}
 		#endregion
 
@@ -166,50 +197,49 @@ namespace TEN.Forms
 			// TO-DO: Usuário deve poder definir modo.
 			graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-			// Mode-exclusive drawings.
-			switch (TENApp.frmMain.EditionMode)
+			foreach (ConnectionLane lane in TENApp.simulator.ConnectionLanes)
 			{
-				case EditorMode.Pointer:
+				graphics.DrawBeziers(penRoad, (PointF[])lane.BezierPoints);
+			}
+
+			DrawEdges(graphics);
+			DrawVehicles(graphics);
+			DrawNodes(graphics);
+
+			// Mode-exclusive drawings.
+			switch (TENApp.state)
+			{
+				case AppState.EditingPointer:
 					break;
 
-				case EditorMode.NewRoad:
+				case AppState.EditingNewRoad:
 					if (clickedNodes.Count > 0)
 					{
-						graphics.DrawEllipse(penNode, clickedNodes[0].Point.X - 5,
-							clickedNodes[0].Point.Y - 5, 10, 10);
-						graphics.DrawLine(penRoadSketch, clickedNodes[0].Point,
-							new Point(mouseX, mouseY));
+						DrawNode(graphics, clickedNodes[0]);
+						if (hoveredNode == MapNode.NoNode)
+							graphics.DrawLine(penRoadSketch, clickedNodes[0].Point,
+								new Point((int)adjustedMouseX, (int)adjustedMouseY));
+						else
+							graphics.DrawLine(penRoadSketch, clickedNodes[0].Point, hoveredNode.Point);
 					}
+
+					if (hoveredNode == MapNode.NoNode)
+						DrawNode(graphics, new MapNode(adjustedMouseX, adjustedMouseY));
 					break;
 
-				case EditorMode.NewTrafficLight:
+				case AppState.EditingNewTrafficLight:
 					break;
 			}
+		}
 
-			// Map drawing.
-			// Draw edges.
+		/// <summary>
+		/// Draws the map's edges.
+		/// </summary>
+		/// <param name="graphics">Graphics object that will be used to draw the edges.</param>
+		private void DrawEdges(Graphics graphics)
+		{
 			foreach (MapEdge edge in TENApp.simulator.Edges)
-			{
 				DrawRoad(graphics, edge);
-			}
-
-			// DrawVehicles.
-			DrawVehicles(graphics);
-
-			// Draw nodes.
-			foreach (MapNode node in TENApp.simulator.Nodes)
-			{
-				if (hoveredNode == node)
-				{
-					graphics.DrawEllipse(penHoveredNode, node.Point.X - 5, node.Point.Y - 5, 10, 10);
-					graphics.FillEllipse(brushHoveredNode, node.Point.X - 5, node.Point.Y - 5, 10, 10);
-				}
-				else
-				{
-					graphics.DrawEllipse(penNode, node.Point.X - 5, node.Point.Y - 5, 10, 10);
-					graphics.FillEllipse(brushNode, node.Point.X - 5, node.Point.Y - 5, 10, 10);
-				}
-			}
 		}
 
 		/// <summary>
@@ -225,24 +255,64 @@ namespace TEN.Forms
 					edge.Lanes[i].DestinationPoint.ToPoint());
 
 				if (i == 0)
-					// Draws roads contours.
+				{
+					// Draw roads contours.
 					graphics.DrawLine(penRoadContour,
 						edge.Lanes[i].UpperSourcePoint.ToPoint(),
 						edge.Lanes[i].UpperDestinationPoint.ToPoint());
+				}
 				else
-					// Draws lanes separators.
+				{
+					// Draw lanes separators.
 					graphics.DrawLine(penLaneSeparator,
 						edge.Lanes[i].UpperSourcePoint.ToPoint(),
 						edge.Lanes[i].UpperDestinationPoint.ToPoint());
+				}
 			}
 			graphics.DrawLine(penRoadContour,
 				edge.Lanes[edge.Lanes.Count - 1].LowerSourcePoint.ToPoint(),
 				edge.Lanes[edge.Lanes.Count - 1].LowerDestinationPoint.ToPoint());
+		}
 
-			if (edge.FromNode.OutEdges.Count > 1)
+		/// <summary>
+		/// Draw the map's nodes.
+		/// </summary>
+		/// <param name="graphics">Graphics object that will be used to draw the nodes.</param>
+		private void DrawNodes(Graphics graphics)
+		{
+			foreach (MapNode node in TENApp.simulator.Nodes)
+				DrawNode(graphics, node);
+		}
+
+		/// <summary>
+		/// Draws a node.
+		/// </summary>
+		/// <param name="graphics">Graphics object that will be used to draw the nodes.</param>
+		/// <param name="node">Node object to be drawed</param>
+		private void DrawNode(Graphics graphics, MapNode node)
+		{
+			Pen nodePen;
+			Brush nodeBrush;
+			if (selectedNode == node)
 			{
-				// TO-DO: curvas
+				nodePen = penSelectedNode;
+				nodeBrush = brushSelectedNode;
 			}
+			else if (hoveredNode == node)
+			{
+				nodePen = penHoveredNode;
+				nodeBrush = brushHoveredNode;
+			}
+			else
+			{
+				nodePen = penNode;
+				nodeBrush = brushNode;
+			}
+
+			graphics.DrawEllipse(nodePen, node.Point.X - nodeRadius, node.Point.Y - nodeRadius,
+				2 * nodeRadius, 2 * nodeRadius);
+			graphics.FillEllipse(nodeBrush, node.Point.X - nodeRadius, node.Point.Y - nodeRadius,
+				2 * nodeRadius, 2 * nodeRadius);
 		}
 
 		/// <summary>
@@ -252,12 +322,21 @@ namespace TEN.Forms
 		private void DrawVehicles(Graphics graphics)
 		{
 			foreach (MapEdge edge in TENApp.simulator.Edges)
+			{
 				foreach (Lane lane in edge.Lanes)
 					lock (lane.Vehicles)
 					{
 						foreach (Vehicle vehicle in lane.Vehicles)
 							DrawVehicle(graphics, vehicle);
 					}
+
+				foreach (ConnectionLane lane in TENApp.simulator.ConnectionLanes)
+					lock (lane.Vehicles)
+					{
+						foreach (Vehicle vehicle in lane.Vehicles)
+							DrawVehicle(graphics, vehicle);
+					}
+			}
 		}
 
 		/// <summary>
@@ -272,32 +351,49 @@ namespace TEN.Forms
 		}
 
 		/// <summary>
-		/// Handles an OnClick event with the NewRoad moad set.
+		/// Handles an OnClick event with the Pointer mode set.
+		/// </summary>
+		private void HandlePointerClick(EventArgs e)
+		{
+			selectedNode = hoveredNode;
+			Refresh();
+		}
+
+		/// <summary>
+		/// Handles an OnClick event with the NewRoad mode set.
 		/// </summary>
 		private void HandleNewRoadClick(EventArgs e)
 		{
-			if (hoveredNode != null)
+			if (hoveredNode != MapNode.NoNode)
+			{
 				clickedNodes.Add(hoveredNode);
+			}
 			else
-				if (clickedNodes.Count == 1)
-					clickedNodes.Add(new MapNode(mouseX, mouseY));
-				else
+			{
+				if (clickedNodes.Count == 0)
 				{
-					FlowNode node = new FlowNode(mouseX, mouseY, 10);
+					// TO-DO: Setar fluxo.
+					FlowNode node = new FlowNode(adjustedMouseX, adjustedMouseY, 15);
 					TENApp.simulator.FlowNodes.Add(node);
 					clickedNodes.Add(node);
 				}
+				else
+				{
+					clickedNodes.Add(new MapNode(adjustedMouseX, adjustedMouseY));
+				}
+			}
 
 			if (clickedNodes.Count >= 2 && clickedNodes[0] != clickedNodes[1])
 			{
 				NumberDialog numberDialog = new NumberDialog();
 				DialogResult result = numberDialog.ShowDialog("New Road", "How many lanes will this road have?", "2");
 
+				// TO-DO: Verificar se usuário entrou int > 0.
 				if (result == DialogResult.OK)
 				{
 					MapNode from = clickedNodes[0], to = clickedNodes[1];
 
-					// Verifies if the destination node was a flow node.
+					// Verifies if the destination node is a flow node.
 					if (to.GetType() == typeof(FlowNode))
 					{
 						// Removes it from the flow nodes list.
@@ -305,7 +401,7 @@ namespace TEN.Forms
 						to = new MapNode(to);
 					}
 
-					// Updates the map's size.
+					#region Update map's size.
 					if (from.Point.X > mapWidth)
 						mapWidth = from.Point.X;
 					if (to.Point.X > mapWidth)
@@ -315,9 +411,47 @@ namespace TEN.Forms
 					if (to.Point.Y > mapHeight)
 						mapHeight = to.Point.Y;
 
-					AutoScrollMinSize = new Size(mapWidth + mapExtraBoundings, mapHeight + mapExtraBoundings);
+					// TO-DO: Verificar como vai ser isso.
+					// AutoScrollMinSize = new Size(mapWidth + mapExtraBoundings, mapHeight + mapExtraBoundings); 
+					#endregion
 
 					MapEdge mapEdge = new MapEdge(numberDialog.Response, from, to);
+
+					#region Trim edges as necessary
+					if (to.InEdges.Count == 0)
+					{
+						foreach (MapEdge edge in to.OutEdges)
+							edge.TrimFromEdge();
+					}
+					if (from.OutEdges.Count == 0)
+					{
+						foreach (MapEdge edge in from.InEdges)
+							edge.TrimToEdge();
+					} 
+					#endregion
+
+					#region Set ToLanes lists
+					foreach (MapEdge edge in to.OutEdges)
+					{
+						for (int i = 0; i < edge.Lanes.Count && i < mapEdge.Lanes.Count; i++)
+						{
+							ConnectionLane cLane = new ConnectionLane(mapEdge.Lanes[i], edge.Lanes[i]);
+							cLane.ToLanes.Add(edge.Lanes[i]);
+							TENApp.simulator.ConnectionLanes.Add(cLane);
+							mapEdge.Lanes[i].ToLanes.Add(cLane);
+						}
+					}
+					foreach (MapEdge edge in from.InEdges)
+					{
+						for (int i = 0; i < edge.Lanes.Count && i < mapEdge.Lanes.Count; i++)
+						{
+							ConnectionLane cLane = new ConnectionLane(edge.Lanes[i], mapEdge.Lanes[i]);
+							cLane.ToLanes.Add(mapEdge.Lanes[i]);
+							TENApp.simulator.ConnectionLanes.Add(cLane);
+							edge.Lanes[i].ToLanes.Add(cLane);
+						}
+					}
+					#endregion
 
 					from.OutEdges.Add(mapEdge);
 					to.InEdges.Add(mapEdge);
@@ -334,6 +468,8 @@ namespace TEN.Forms
 
 			if (clickedNodes.Count >= 2)
 				ClearClickedPoints();
+
+			Refresh();
 		}
 		#endregion
 
@@ -353,31 +489,34 @@ namespace TEN.Forms
 			RenderMap(pe.Graphics);
 		}
 
-		protected override void OnScroll(ScrollEventArgs se)
+		/// <summary>
+		/// Handles OnMouseDown event.
+		/// </summary>
+		protected override void OnMouseDown(MouseEventArgs e)
 		{
-			base.OnScroll(se);
-			Refresh();
+			base.OnMouseDown(e);
 		}
 
 		/// <summary>
-		/// Handles the OnClick event.
+		/// Handles OnMouseUp event.
 		/// </summary>
-		protected override void OnClick(EventArgs e)
+		protected override void OnMouseUp(MouseEventArgs e)
 		{
-			base.OnClick(e);
+			base.OnMouseUp(e);
 			if (!TENApp.frmMain.Running)
 				return;
 
-			switch (TENApp.frmMain.EditionMode)
+			switch (TENApp.state)
 			{
-				case EditorMode.Pointer:
+				case AppState.EditingPointer:
+					HandlePointerClick(e);
 					break;
 
-				case EditorMode.NewRoad:
+				case AppState.EditingNewRoad:
 					HandleNewRoadClick(e);
 					break;
 
-				case EditorMode.NewTrafficLight:
+				case AppState.EditingNewTrafficLight:
 					break;
 			}
 		}
@@ -389,15 +528,28 @@ namespace TEN.Forms
 		{
 			base.OnMouseMove(e);
 
-			mouseX = (int)((e.X) / zoom) - AutoScrollPosition.X;
-			mouseY = (int)((e.Y) / zoom) - AutoScrollPosition.Y;
+			adjustedMouseX = mouseX = ((e.X) / zoom) - AutoScrollPosition.X;
+			adjustedMouseY = mouseY = ((e.Y) / zoom) - AutoScrollPosition.Y;
 
-			if (hoveredNode == null || hoveredNode.Distance(mouseX, mouseY) > 12)
+			// Adjust mouse coordinates, if needed.
+			if (TENApp.state == AppState.EditingNewRoad && clickedNodes.Count > 0 && clickedNodes[0].InEdges.Count > 0)
 			{
-				hoveredNode = null;
+				Vector newRoadSense = new Vector(clickedNodes[0].Point, new Point((int)mouseX, (int)mouseY));
+
+				if (clickedNodes[0].InEdges[0].SenseVector * newRoadSense < 0)
+				{
+					Vector orthogonal = clickedNodes[0].InEdges[0].OrthogonalVector;
+					adjustedMouseX = clickedNodes[0].Point.X + (orthogonal * newRoadSense) * orthogonal.X;
+					adjustedMouseY = clickedNodes[0].Point.Y + (orthogonal * newRoadSense) * orthogonal.Y;
+				}
+			}
+
+			if (hoveredNode == MapNode.NoNode || hoveredNode.Distance(mouseX, mouseY) > snapOffset)
+			{
+				hoveredNode = MapNode.NoNode;
 				foreach (MapNode node in TENApp.simulator.Nodes)
 				{
-					if (node.Distance(mouseX, mouseY) < 12)
+					if (node.Distance(mouseX, mouseY) < snapOffset)
 					{
 						hoveredNode = node;
 						break;
@@ -405,7 +557,31 @@ namespace TEN.Forms
 				}
 			}
 
-			// TO-DO: Refresh só se estiver em modo de edição.
+			switch (TENApp.state)
+			{
+				case AppState.EditingPointer:
+				case AppState.EditingNewRoad:
+				case AppState.EditingNewTrafficLight:
+					Refresh();
+					break;
+			}
+		}
+
+		/// <summary>
+		/// Handles OnMouseWheel event.
+		/// </summary>
+		protected override void OnMouseWheel(MouseEventArgs e)
+		{
+			base.OnMouseWheel(e);
+			Refresh();
+		}
+
+		/// <summary>
+		/// Handles OnRegionChanged event.
+		/// </summary>
+		protected override void OnRegionChanged(EventArgs e)
+		{
+			base.OnRegionChanged(e);
 			Refresh();
 		}
 		#endregion

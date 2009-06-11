@@ -52,10 +52,6 @@ namespace TEN.Structures
 		{
 			this.x = to.X - from.X;
 			this.y = to.Y - from.Y;
-			float size = (float)Math.Sqrt(this.x * this.x + this.y * this.y);
-
-			this.x /= size;
-			this.y /= size;
 		}
 
 		/// <summary>
@@ -78,6 +74,22 @@ namespace TEN.Structures
 		}
 
 		/// <summary>
+		/// Subtracts two vectors. :D
+		/// </summary>
+		public static Vector operator -(Vector leftSide, Vector rightSide)
+		{
+			return new Vector(leftSide.X - rightSide.X, leftSide.Y - rightSide.Y);
+		}
+
+		/// <summary>
+		/// Returns the dot product between two vectors.
+		/// </summary>
+		public static float operator *(Vector leftSide, Vector rightSide)
+		{
+			return leftSide.X * rightSide.X + leftSide.Y * rightSide.Y;
+		}
+
+		/// <summary>
 		/// Multiplies a vector by a float.
 		/// </summary>
 		public static Vector operator *(float leftSide, Vector rightSide)
@@ -90,11 +102,38 @@ namespace TEN.Structures
 		}
 
 		/// <summary>
+		/// Returns the euclidean distance between this vector (as a point) and another one.
+		/// </summary>
+		/// <param name="secondVector">Vector to be compared.</param>
+		public float Distance(Vector secondVector)
+		{
+			return (float)Math.Sqrt((x - secondVector.X) * (x - secondVector.X) + (y - secondVector.Y) * (y - secondVector.Y));
+		}
+
+		/// <summary>
 		/// Returns the Point-equivalent object of this Vector.
 		/// </summary>
 		public Point ToPoint()
 		{
 			return (new Point((int)x, (int)y));
+		}
+
+		public PointF ToPointF()
+		{
+			return new PointF(x, y);
+		}
+
+		/// <summary>
+		/// Transforms the vector in an unitary vector and returns itself.
+		/// </summary>
+		public Vector ToUnitary()
+		{
+			float size = (float)Math.Sqrt(x * x + y * y);
+
+			x /= size;
+			y /= size;
+
+			return this;
 		}
 
 		/// <summary>

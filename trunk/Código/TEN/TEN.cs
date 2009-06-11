@@ -69,39 +69,33 @@ namespace TEN
 		/// </summary>
 		static void Main()
 		{
-			try
-			{
-				Application.EnableVisualStyles();
-				Application.SetCompatibleTextRenderingDefault(false);
-				TENApp.frmMain = new FrmMain();
-				TENApp.frmMain.Show();
-				TENApp.running = true;
-				TENApp.shutdownStarted = false;
-				TENApp.state = AppState.EditingPointer;
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
+			TENApp.frmMain = new FrmMain();
+			TENApp.frmMain.Show();
+			TENApp.running = true;
+			TENApp.shutdownStarted = false;
+			TENApp.state = AppState.EditingPointer;
 
-				TENApp.threadMain = Thread.CurrentThread;
-				TENApp.threadMain.Name = "MainThread";
+			TENApp.threadMain = Thread.CurrentThread;
+			TENApp.threadMain.Name = "MainThread";
 
-				#region Initialize other modules
-				TENApp.simulator = new Simulator();
-				TENApp.refresher = new Refresher(40);
-				#endregion
+			#region Initialize other modules
+			TENApp.simulator = new Simulator();
+			TENApp.refresher = new Refresher(40);
+			#endregion
 
-				#region Start the threads
-				TENApp.threadSimulator = new Thread(new ThreadStart(TENApp.simulator.Run));
-				TENApp.threadSimulator.Name = "Simulator";
+			#region Start the threads
+			TENApp.threadSimulator = new Thread(new ThreadStart(TENApp.simulator.ThreadRun));
+			TENApp.threadSimulator.Name = "Simulator";
+			TENApp.threadSimulator.Start();
 
-				TENApp.threadRefresher = new Thread(new ThreadStart(TENApp.refresher.Run));
-				TENApp.threadRefresher.Name = "Refresher";
-				TENApp.threadRefresher.Start();
-				#endregion
+			TENApp.threadRefresher = new Thread(new ThreadStart(TENApp.refresher.Run));
+			TENApp.threadRefresher.Name = "Refresher";
+			TENApp.threadRefresher.Start();
+			#endregion
 
-				Application.Run(frmMain);
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e.Message);
-			}
+			Application.Run(frmMain);
 		}
 		#endregion
 
@@ -120,7 +114,7 @@ namespace TEN
 
 			// Stop the threads.
 			TENApp.refresher.Stop();
-			TENApp.simulator.Stop();
+			TENApp.simulator.ThreadStop();
 			Application.Exit();
 		}
 		#endregion
