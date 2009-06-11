@@ -64,13 +64,22 @@ namespace TEN.Structures
 			get { return length; }
 		}
 
-		private Vector orthonalVector;
+		private Vector senseVector;
+		/// <summary>
+		/// Unitary vector that indicates the sense of this edge.
+		/// </summary>
+		public Vector SenseVector
+		{
+			get { return senseVector; }
+		}
+
+		private Vector orthogonalVector;
 		/// <summary>
 		/// Unitary orthogonal vector related to the edge.
 		/// </summary>
-		public Vector OrthonalVector
+		public Vector OrthogonalVector
 		{
-			get { return orthonalVector; }
+			get { return orthogonalVector; }
 		}
 		#endregion
 
@@ -86,13 +95,33 @@ namespace TEN.Structures
 			this.lanes = new List<Lane>();
 			this.fromNode = from;
 			this.toNode = to;
-			this.orthonalVector = new Vector(from.Point, to.Point);
-			this.orthonalVector.Rotate90();
+			this.senseVector = new Vector(from.Point, to.Point).ToUnitary();
+			this.orthogonalVector = new Vector(from.Point, to.Point).ToUnitary().Rotate90();
 			this.maximumSpeed = defaultMaximumSpeed;
 			this.length = to.Distance(from.Point.X, from.Point.Y);
 
 			for (int i = 1; i <= lanesNumber; i++)
 				this.lanes.Add(new Lane(this, lanesNumber, i));
+
+			#region Set right and left lane references for each lane
+			for (int i = 1; i < lanesNumber - 1; i++)
+			{
+				this.lanes[i].LeftLane = this.lanes[i - 1];
+				this.lanes[i].RightLane = this.lanes[i + 1];
+			}
+			if (this.lanes.Count > 1)
+			{
+				this.lanes[0].RightLane = this.lanes[1];
+				this.lanes[lanesNumber - 1].LeftLane = this.lanes[lanesNumber - 2];
+			}
+			#endregion
+
+			#region Trim edges if necessary
+			if (toNode.OutEdges.Count > 0)
+				TrimToEdge();
+			if (fromNode.InEdges.Count > 0)
+				TrimFromEdge(); 
+			#endregion
 		}
 		#endregion
 
@@ -104,57 +133,42 @@ namespace TEN.Structures
 		public void SimulationStep(int simulationStep)
 		{
 			foreach (Lane lane in lanes)
-			{
-				lock (lane.Vehicles)
-				{
-					foreach (Vehicle vehicle in lane.Vehicles)
-						SimulateVehicle(vehicle, simulationStep);
+				lane.SimulationStep(simulationStep);
+		}
 
-					// Clear vehicles that should not be in this lane.
-					foreach (Vehicle vehicle in lane.ToBeRemoved)
-						lane.Vehicles.Remove(vehicle);
-					lane.ToBeRemoved.Clear();
-				}
+		/// <summary>
+		/// Trims edges.
+		/// </summary>
+		public void TrimFromEdge()
+		{
+			float trimSize = lanes.Count * Simulator.LaneWidth * 0.75F;
+			Vector trimVector = trimSize * senseVector;
+
+			length -= trimSize;
+
+			foreach (Lane lane in lanes)
+			{	
+				lane.SourcePoint += trimVector;
+				lane.LowerSourcePoint += trimVector;
+				lane.UpperSourcePoint += trimVector;
 			}
 		}
-		#endregion
 
-		#region Private Methods
 		/// <summary>
-		/// Make the necessary changes in a given vehicle object (and other related objects) 
-		/// for a simulation step.
+		/// Trims edges.
 		/// </summary>
-		/// <param name="vehicle">Vehicle being simulated.</param>
-		/// <param name="simulationStep">Simulation step value.</param>
-		private void SimulateVehicle(Vehicle vehicle, int simulationStep)
+		public void TrimToEdge()
 		{
-			vehicle.Position += vehicle.Speed * simulationStep / 1000;
-			vehicle.Speed += vehicle.Acceleration * simulationStep / 1000;
-			if (vehicle.Speed >= maximumSpeed)
-				vehicle.Speed = maximumSpeed;
+			float trimSize = lanes.Count * Simulator.LaneWidth * 0.75F;
+			Vector trimVector = trimSize * senseVector;
 
-			if (vehicle.Position > length)
+			length -= trimSize;
+
+			foreach (Lane lane in lanes)
 			{
-				vehicle.Lane.ToBeRemoved.Add(vehicle);
-				if (toNode.OutEdges.Count == 0)
-				{
-					// A final node has been reached.
-				}
-				else
-				{
-					// Vehicle reached other edge.
-					// TO-DO: Curva suave.
-					int lane = vehicle.Lane.LaneNumber;
-					if (toNode.OutEdges[0].lanes.Count < lane)
-						lane = toNode.OutEdges[0].lanes.Count;
-
-					lock (toNode.OutEdges[0].lanes[lane - 1].Vehicles)
-					{
-						vehicle.Position = 0;
-						vehicle.Lane = toNode.OutEdges[0].lanes[lane - 1];
-						toNode.OutEdges[0].lanes[lane - 1].Vehicles.Add(vehicle);
-					}
-				}
+				lane.DestinationPoint -= trimVector;
+				lane.LowerDestinationPoint -= trimVector;
+				lane.UpperDestinationPoint -= trimVector;
 			}
 		}
 		#endregion

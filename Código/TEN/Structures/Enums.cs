@@ -1,27 +1,6 @@
 ﻿namespace TEN.Structures
 {
 	/// <summary>
-	/// Available modes of edition.
-	/// </summary>
-	public enum EditorMode : short
-	{
-		/// <summary>
-		/// Mode that lets the user select any map component.
-		/// </summary>
-		Pointer = 0,
-
-		/// <summary>
-		/// Mode that adds new roads to the map.
-		/// </summary>
-		NewRoad = 1,
-
-		/// <summary>
-		/// Mode that lets the user add new traffic lights to the map.
-		/// </summary>
-		NewTrafficLight = 2
-	}
-
-	/// <summary>
 	/// Available macro application states.
 	/// </summary>
 	public enum AppState : short
@@ -55,5 +34,16 @@
 		/// Other application state.
 		/// </summary>
 		Other
+	}
+
+	/// <summary>
+	/// Possible node types.
+	/// </summary>
+	public enum NodeType : short
+	{
+		/// <summary>
+		/// TO-DO
+		/// </summary>
+		FlowNode
 	}
 }

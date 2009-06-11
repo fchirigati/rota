@@ -102,6 +102,69 @@ namespace TEN.Structures
 
 		#region Public Methods
 		/// <summary>
+		/// Runs a simulation step.
+		/// </summary>
+		/// <param name="simulationStep">Simulation step value.</param>
+		/// <param name="nextVehicle">Next vehicle in the lane. null if none</param>
+		public void SimulationStep(int simulationStep, Vehicle nextVehicle)
+		{
+			position += speed * simulationStep / 1000;
+
+			bool canIncreaseSpeed = false;
+			if (nextVehicle != null)
+			{
+				if (nextVehicle.Position - position <= TENApp.simulator.SafetyDistance + length)
+				{
+					if (speed - deceleration > nextVehicle.speed)
+					{
+						speed = nextVehicle.speed;
+					}
+					else if (speed > nextVehicle.speed
+						|| nextVehicle.Position - position <= TENApp.simulator.SafetyDistance)
+					{
+						speed -= deceleration * simulationStep / 1000;
+					}
+				}
+				else
+				{
+					canIncreaseSpeed = true;
+				}
+			}
+			else
+			{
+				canIncreaseSpeed = true;
+			}
+
+			if (canIncreaseSpeed)
+			{
+				speed += acceleration * simulationStep / 1000;
+				if (speed >= lane.Edge.MaximumSpeed)
+					speed = lane.Edge.MaximumSpeed;
+			}
+
+			if (position > lane.Length)
+			{
+				lane.ToBeRemoved.Add(this);
+				if (lane.ToLanes.Count == 0)
+				{
+					// A final node has been reached.
+				}
+				else
+				{
+					// Vehicle reached other edge.
+					Lane destLane = lane.ToLanes[TENApp.simulator.Random.Next(lane.ToLanes.Count)];
+					
+					lock (destLane.Vehicles)
+					{
+						position = 0;
+						lane = destLane;
+						destLane.Vehicles.AddFirst(this);
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// Get the points in the map that bounds the car.
 		/// </summary>
 		public Point[] GetPoints()
@@ -109,10 +172,10 @@ namespace TEN.Structures
 			// TO-DO: Fazer método mais eficiente, guardando pontos anteriores,
 			// que só precise fazer soma de vetores [ou não...].
 			Point[] points = new Point[4];
-			Vector basePoint = lane.SourcePoint + position * lane.Pointer;
-			Vector baseVector = new Vector(lane.Pointer.X, lane.Pointer.Y);
+			Vector basePoint = lane.GetPoint(position);
+			Vector baseVector = lane.GetPointer(position);
 
-			basePoint += baseVector.Rotate90() * Simulator.VehicleWidth * (float)0.5;
+			basePoint += baseVector.Rotate90() * Simulator.VehicleWidth * 0.5F;
 			points[0] = new Point((int)basePoint.X, (int)basePoint.Y);
 
 			basePoint += baseVector.Rotate270() * length;

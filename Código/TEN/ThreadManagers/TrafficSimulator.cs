@@ -15,7 +15,7 @@ namespace TEN
 		/// <summary>
 		/// Width of each lane (in pixels).
 		/// </summary>
-		public const int LaneWidth = 25;
+		public const int LaneWidth = 26;
 
 		/// <summary>
 		/// Width of the vehicles (in pixels).
@@ -25,9 +25,27 @@ namespace TEN
 
 		#region Fields
 		/// <summary>
-		/// States if this simulator is running.
+		/// States if the thread should be running or not.
 		/// </summary>
 		private bool running;
+
+		private Random random;
+		/// <summary>
+		/// Random object used when necessary.
+		/// </summary>
+		public Random Random
+		{
+			get { return random; }
+		}
+
+		private bool isSimulating;
+		/// <summary>
+		/// States if this simulator is running.
+		/// </summary>
+		public bool IsSimulating
+		{
+			get { return isSimulating; }
+		}
 
 		private bool simulationStepDone;
 		/// <summary>
@@ -86,6 +104,15 @@ namespace TEN
 			get { return flowNodes; }
 		}
 
+		private List<ConnectionLane> connectionLanes;
+		/// <summary>
+		/// Connection lanes that are generated automatically by the simulator.
+		/// </summary>
+		public List<ConnectionLane> ConnectionLanes
+		{
+			get { return connectionLanes; }
+		}
+
 		private int safetyDistance;
 		/// <summary>
 		/// Gets or sets the safety distance between vehicles.
@@ -104,28 +131,55 @@ namespace TEN
 		public Simulator()
 		{
 			this.running = true;
+			this.random = new Random();
+			this.isSimulating = false;
 			this.simulationStepDone = false;
 			this.edges = new List<MapEdge>();
 			this.nodes = new List<MapNode>();
 			this.flowNodes = new List<FlowNode>();
 			this.simulationStepTime = 60;
 			this.simulationDelay = 30;
-			this.safetyDistance = 30;
+			this.safetyDistance = 15;
+			this.connectionLanes = new List<ConnectionLane>();
 		}
 		#endregion
 
 		#region Public Methods
 		/// <summary>
-		/// Runs the simulation.
+		/// Method that a thread should run in order to use this object.
 		/// </summary>
-		public void Run()
+		public void ThreadRun()
 		{
 			while (running)
 			{
-				SimulationStep();
-				simulationStepDone = true;
-				Thread.Sleep(simulationDelay);
+				while (running && isSimulating)
+				{
+					SimulationStep();
+					simulationStepDone = true;
+					Thread.Sleep(simulationDelay);
+				}
+
+				Thread.Sleep(1000);
 			}
+		}
+
+		/// <summary>
+		/// Method called to end the thread running this object's ThreadRun method gracefully.
+		/// </summary>
+		public void ThreadStop()
+		{
+			running = false;
+		}
+
+		/// <summary>
+		/// Starts the simulation.
+		/// </summary>
+		public void Start()
+		{
+			if (isSimulating)
+				return;
+
+			isSimulating = true;
 		}
 		
 		/// <summary>
@@ -133,7 +187,23 @@ namespace TEN
 		/// </summary>
 		public void Stop()
 		{
-			running = false;
+			if (!isSimulating)
+				return;
+
+			isSimulating = false;
+
+			// TO-DO: Encapsular em métodos de Clear.
+			foreach (MapEdge edge in edges)
+				foreach (Lane lane in edge.Lanes)
+					lock (lane.Vehicles)
+						lane.Vehicles.Clear();
+
+			foreach (ConnectionLane lane in ConnectionLanes)
+				lock (lane.Vehicles)
+					lane.Vehicles.Clear();
+
+			foreach (FlowNode node in flowNodes)
+				node.Counter = 0;
 		}
 
 		/// <summary>
@@ -141,6 +211,10 @@ namespace TEN
 		/// </summary>
 		public void Pause()
 		{
+			if (!isSimulating)
+				return;
+
+			isSimulating = false;
 		}
 		#endregion
 
@@ -152,6 +226,9 @@ namespace TEN
 		{
 			foreach (MapEdge edge in edges)
 				edge.SimulationStep(simulationStepTime);
+
+			foreach (ConnectionLane lane in ConnectionLanes)
+				lane.SimulationStep(simulationStepTime);
 
 			foreach (FlowNode node in flowNodes)
 				node.SimulationStep(simulationStepTime);

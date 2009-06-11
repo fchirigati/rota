@@ -95,6 +95,7 @@
     <Compile Include="Structures\MapNode.cs" />
     <Compile Include="Structures\Vector.cs" />
     <Compile Include="Structures\Vehicle.cs" />
+    <Compile Include="Structures\ConnectionLane.cs" />
     <Compile Include="ThreadManagers\Refresher.cs" />
     <Compile Include="Structures\Enums.cs" />
     <Compile Include="TEN.cs" />
