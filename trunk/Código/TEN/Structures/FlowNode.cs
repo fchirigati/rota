@@ -72,7 +72,7 @@ namespace TEN.Structures
 
 					if (!occupiedEntrance)
 					{
-						vehicles.AddFirst(new Vehicle(30, 2, 40, TENApp.simulator.Random.Next(40) + 40,
+						vehicles.AddFirst(new Vehicle(30, 10, 40, TENApp.simulator.Random.Next(40) + 40,
 							Color.White, OutEdges[0].Lanes[lane]));
 						counter = 0;
 					}

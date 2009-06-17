@@ -77,6 +77,7 @@ namespace TEN
 			set { simulationDelay = value; }
 		}
 
+		#region Map Data
 		private List<MapEdge> edges;
 		/// <summary>
 		/// MapEdge objects contained in the map.
@@ -104,14 +105,15 @@ namespace TEN
 			get { return flowNodes; }
 		}
 
-		private List<ConnectionLane> connectionLanes;
+		private List<MapEdge> connectionEdges;
 		/// <summary>
 		/// Connection lanes that are generated automatically by the simulator.
 		/// </summary>
-		public List<ConnectionLane> ConnectionLanes
+		public List<MapEdge> ConnectionEdges
 		{
-			get { return connectionLanes; }
+			get { return connectionEdges; }
 		}
+		#endregion
 
 		private int safetyDistance;
 		/// <summary>
@@ -140,7 +142,7 @@ namespace TEN
 			this.simulationStepTime = 60;
 			this.simulationDelay = 30;
 			this.safetyDistance = 15;
-			this.connectionLanes = new List<ConnectionLane>();
+			this.connectionEdges = new List<MapEdge>();
 		}
 		#endregion
 
@@ -198,9 +200,10 @@ namespace TEN
 					lock (lane.Vehicles)
 						lane.Vehicles.Clear();
 
-			foreach (ConnectionLane lane in ConnectionLanes)
-				lock (lane.Vehicles)
-					lane.Vehicles.Clear();
+			foreach (MapEdge edge in connectionEdges)
+				foreach (Lane lane in edge.Lanes)
+					lock (lane.Vehicles)
+						lane.Vehicles.Clear();
 
 			foreach (FlowNode node in flowNodes)
 				node.Counter = 0;
@@ -227,8 +230,8 @@ namespace TEN
 			foreach (MapEdge edge in edges)
 				edge.SimulationStep(simulationStepTime);
 
-			foreach (ConnectionLane lane in ConnectionLanes)
-				lane.SimulationStep(simulationStepTime);
+			foreach (MapEdge edge in connectionEdges)
+				edge.SimulationStep(simulationStepTime);
 
 			foreach (FlowNode node in flowNodes)
 				node.SimulationStep(simulationStepTime);

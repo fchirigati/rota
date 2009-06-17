@@ -124,6 +124,9 @@ namespace TEN.Structures
 					{
 						speed -= deceleration * simulationStep / 1000;
 					}
+
+					if (speed < 0)
+						speed = 0;
 				}
 				else
 				{
