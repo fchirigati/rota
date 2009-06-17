@@ -1,0 +1,40 @@
+SIMULATION REPORT
+------------------------------------------------------------
+
+SIMULATION 1
+
+   Start time:	17-06-2009 15:04:55
+   End time:	17-06-2009 18:56:24
+
+   Map Info:
+     . Number of roads: 8
+     . Number of semaphores: 3
+     . Flow: 25 cars/minute
+     . Safety Distance: 2 meters
+     . Simulation Step: 60
+
+   Number of paused times: 3
+
+   Simulation Info:
+     . Average Speed: 80,24 kilometers/hour
+     . Number of cars: 2021
+
+------------------------------------------------------------
+
+SIMULATION 1
+
+   Start time:	17-06-2009 19:10:01
+   End time:	17-06-2009 19:20:43 (PAUSED)
+
+   Map Info:
+     . Number of roads: 9
+     . Number of semaphores: 5
+     . Flow: 30 cars/minute
+     . Safety Distance: 2 meters
+     . Simulation Step: 60
+
+   Number of paused times: 2
+
+   Simulation Info:
+     . Average Speed: 74,52 kilometers/hour
+     . Number of cars: 567
