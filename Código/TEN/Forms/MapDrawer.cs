@@ -135,11 +135,11 @@ namespace TEN.Forms
 			this.colorSelectedNode = Color.Red;
 
 			this.penRoad = new Pen(colorRoad, Simulator.LaneWidth);
-			this.penRoadContour = new Pen(Color.Black, 2);
+			this.penRoadContour = new Pen(Color.Black, 3);
 			this.penVehicleContour = new Pen(Color.Black, 2);
 			this.penLaneSeparator = new Pen(Color.White, 2);
 			//this.penLaneSeparator.DashStyle = DashStyle.Custom;
-			this.penLaneSeparator.DashPattern = new float[]{5.0F, 5.0F};
+			this.penLaneSeparator.DashPattern = new float[]{5.0F, 10.0F};
 			this.penRoadSketch = new Pen(Color.FromArgb(128, colorRoad), Simulator.LaneWidth);
 			this.penNode = new Pen(colorNode, 1);
 			this.penSelectedNode = new Pen(colorSelectedNode, 1);
@@ -197,12 +197,9 @@ namespace TEN.Forms
 			// TO-DO: Usuário deve poder definir modo.
 			graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-			foreach (ConnectionLane lane in TENApp.simulator.ConnectionLanes)
-			{
-				graphics.DrawBeziers(penRoad, (PointF[])lane.BezierPoints);
-			}
-
-			DrawEdges(graphics);
+			DrawRoadContours(graphics);
+			DrawRoads(graphics);
+			DrawRoadSeparators(graphics);
 			DrawVehicles(graphics);
 			DrawNodes(graphics);
 
@@ -233,45 +230,77 @@ namespace TEN.Forms
 		}
 
 		/// <summary>
-		/// Draws the map's edges.
+		/// Draws all the roads (without contours and lane separators).
 		/// </summary>
-		/// <param name="graphics">Graphics object that will be used to draw the edges.</param>
-		private void DrawEdges(Graphics graphics)
+		/// <param name="graphics">Graphics object that will be used to draw the roads.</param>
+		private void DrawRoads(Graphics graphics)
 		{
 			foreach (MapEdge edge in TENApp.simulator.Edges)
-				DrawRoad(graphics, edge);
+			{
+				foreach (Lane lane in edge.Lanes)
+					graphics.DrawLine(penRoad, lane.SourcePoint.ToPointF(), lane.DestinationPoint.ToPointF());
+			}
+
+			foreach (MapEdge edge in TENApp.simulator.ConnectionEdges)
+			{
+				foreach (Lane lane in edge.Lanes)
+				{
+					ConnectionLane connLane = (ConnectionLane)lane;
+					graphics.DrawBeziers(penRoad, connLane.BezierPoints);
+				}
+			}
 		}
 
 		/// <summary>
-		/// Draws a road in the map based on a given edge.
+		/// Draws all the roads' contours.
 		/// </summary>
-		/// <param name="graphics">Graphics object that will be used to draw the road.</param>
-		/// <param name="edge">The edge that represents the road to be drawed.</param>
-		private void DrawRoad(Graphics graphics, MapEdge edge)
+		/// <param name="graphics">Graphics object that will be used to draw the contours.</param>
+		private void DrawRoadContours(Graphics graphics)
 		{
-			for (int i = 0; i < edge.Lanes.Count; i++)
+			foreach (MapEdge edge in TENApp.simulator.Edges)
 			{
-				graphics.DrawLine(penRoad, edge.Lanes[i].SourcePoint.ToPoint(),
-					edge.Lanes[i].DestinationPoint.ToPoint());
+				graphics.DrawLine(penRoadContour,
+					edge.Lanes[0].UpperSourcePoint.ToPointF(),
+					edge.Lanes[0].UpperDestinationPoint.ToPointF());
 
-				if (i == 0)
+				graphics.DrawLine(penRoadContour,
+					edge.Lanes[edge.Lanes.Count - 1].LowerSourcePoint.ToPointF(),
+					edge.Lanes[edge.Lanes.Count - 1].LowerDestinationPoint.ToPointF());
+			}
+
+			foreach (MapEdge edge in TENApp.simulator.ConnectionEdges)
+			{
+				ConnectionLane lowerLane = (ConnectionLane)edge.Lanes[0];
+				ConnectionLane upperLane = (ConnectionLane)edge.Lanes[edge.Lanes.Count - 1];
+
+				graphics.DrawBeziers(penRoadContour, lowerLane.UpperBezierPoints);
+				graphics.DrawBeziers(penRoadContour, upperLane.LowerBezierPoints);
+			}
+		}
+
+		/// <summary>
+		/// Draws all the road separators in the map.
+		/// </summary>
+		/// <param name="graphics">Graphics object that will be used to draw the road separators.</param>
+		private void DrawRoadSeparators(Graphics graphics)
+		{
+			foreach (MapEdge edge in TENApp.simulator.Edges)
+			{
+				for (int i = 1; i < edge.Lanes.Count; i++)
 				{
-					// Draw roads contours.
-					graphics.DrawLine(penRoadContour,
-						edge.Lanes[i].UpperSourcePoint.ToPoint(),
-						edge.Lanes[i].UpperDestinationPoint.ToPoint());
-				}
-				else
-				{
-					// Draw lanes separators.
 					graphics.DrawLine(penLaneSeparator,
 						edge.Lanes[i].UpperSourcePoint.ToPoint(),
 						edge.Lanes[i].UpperDestinationPoint.ToPoint());
 				}
 			}
-			graphics.DrawLine(penRoadContour,
-				edge.Lanes[edge.Lanes.Count - 1].LowerSourcePoint.ToPoint(),
-				edge.Lanes[edge.Lanes.Count - 1].LowerDestinationPoint.ToPoint());
+
+			foreach (MapEdge edge in TENApp.simulator.ConnectionEdges)
+			{
+				for (int i = 1; i < edge.Lanes.Count; i++)
+				{
+					graphics.DrawBeziers(penLaneSeparator, ((ConnectionLane)edge.Lanes[i]).UpperBezierPoints);
+				}
+			}
 		}
 
 		/// <summary>
@@ -329,8 +358,11 @@ namespace TEN.Forms
 						foreach (Vehicle vehicle in lane.Vehicles)
 							DrawVehicle(graphics, vehicle);
 					}
+			}
 
-				foreach (ConnectionLane lane in TENApp.simulator.ConnectionLanes)
+			foreach (MapEdge edge in TENApp.simulator.ConnectionEdges)
+			{
+				foreach (Lane lane in edge.Lanes)
 					lock (lane.Vehicles)
 					{
 						foreach (Vehicle vehicle in lane.Vehicles)
@@ -433,23 +465,27 @@ namespace TEN.Forms
 					#region Set ToLanes lists
 					foreach (MapEdge edge in to.OutEdges)
 					{
+						MapEdge cEdge = new MapEdge(Math.Min(edge.Lanes.Count, mapEdge.Lanes.Count), to, to);
 						for (int i = 0; i < edge.Lanes.Count && i < mapEdge.Lanes.Count; i++)
 						{
 							ConnectionLane cLane = new ConnectionLane(mapEdge.Lanes[i], edge.Lanes[i]);
 							cLane.ToLanes.Add(edge.Lanes[i]);
-							TENApp.simulator.ConnectionLanes.Add(cLane);
+							cEdge.Lanes[i] = cLane;
 							mapEdge.Lanes[i].ToLanes.Add(cLane);
 						}
+						TENApp.simulator.ConnectionEdges.Add(cEdge);
 					}
 					foreach (MapEdge edge in from.InEdges)
 					{
+						MapEdge cEdge = new MapEdge(Math.Min(edge.Lanes.Count, mapEdge.Lanes.Count), to, to);
 						for (int i = 0; i < edge.Lanes.Count && i < mapEdge.Lanes.Count; i++)
 						{
 							ConnectionLane cLane = new ConnectionLane(edge.Lanes[i], mapEdge.Lanes[i]);
 							cLane.ToLanes.Add(mapEdge.Lanes[i]);
-							TENApp.simulator.ConnectionLanes.Add(cLane);
+							cEdge.Lanes[i] = cLane;
 							edge.Lanes[i].ToLanes.Add(cLane);
 						}
+						TENApp.simulator.ConnectionEdges.Add(cEdge);
 					}
 					#endregion
 

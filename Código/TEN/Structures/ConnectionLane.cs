@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using TEN.ThreadManagers;
 
 namespace TEN.Structures
 {
@@ -46,6 +47,24 @@ namespace TEN.Structures
 		{
 			get { return bezierPoints; }
 		}
+
+		private PointF[] upperBezierPoints;
+		/// <summary>
+		/// Ordernated list of the upper bezier points of this lane.
+		/// </summary>
+		public PointF[] UpperBezierPoints
+		{
+			get { return upperBezierPoints; }
+		}
+
+		private PointF[] lowerBezierPoints;
+		/// <summary>
+		/// Ordernated list of the lower bezier points of this lane.
+		/// </summary>
+		public PointF[] LowerBezierPoints
+		{
+			get { return lowerBezierPoints; }
+		}
 		#endregion
 
 		#region Constructors
@@ -54,43 +73,19 @@ namespace TEN.Structures
 		{
 			this.fromLane = parentLane;
 			this.toLane = targetLane;
-			this.bezierPoints = new PointF[4];
+			this.bezierPoints = SetBezierPoints(fromLane.DestinationPoint, 
+				toLane.SourcePoint, fromLane.Pointer, toLane.Pointer);
+			this.upperBezierPoints = SetBezierPoints(fromLane.UpperDestinationPoint,
+				toLane.UpperSourcePoint, fromLane.Pointer, toLane.Pointer);
+			this.lowerBezierPoints = SetBezierPoints(fromLane.LowerDestinationPoint,
+				toLane.LowerSourcePoint, fromLane.Pointer, toLane.Pointer);
 			this.bezierVectors = new Vector[4];
-
-			#region Set bezier points
-			this.bezierPoints[0] = fromLane.DestinationPoint.ToPointF();
-
-			Vector moveVector = new Vector(parentLane.DestinationPoint, targetLane.SourcePoint);
-			Vector rotatedUnitary = new Vector(fromLane.Pointer.X, fromLane.Pointer.Y).Rotate90();
-			Vector firstPoint, secondPoint;
-			float denominator = rotatedUnitary * toLane.Pointer;
-			if (Math.Abs(denominator) <= 0.1)
-			{
-				// Connected lanes are almost in the same direction.
-				firstPoint = parentLane.DestinationPoint + moveVector * 0.33F;
-				secondPoint = parentLane.DestinationPoint + moveVector * 0.67F;
-				this.bezierPoints[1] = firstPoint.ToPointF();
-				this.bezierPoints[2] = secondPoint.ToPointF();
-			}
-			else
-			{
-				float coefficient = rotatedUnitary * moveVector / denominator;
-				Vector intersection = toLane.SourcePoint - coefficient * targetLane.Pointer;
-
-				firstPoint = parentLane.DestinationPoint + (intersection - parentLane.DestinationPoint) * 0.5F;
-				secondPoint = toLane.SourcePoint - (toLane.SourcePoint - intersection) * 0.5F;
-				this.bezierPoints[1] = firstPoint.ToPointF();
-				this.bezierPoints[2] = secondPoint.ToPointF();
-			}
-			
-			this.bezierPoints[3] = toLane.SourcePoint.ToPointF();
 
 			#region Set bezier vectors
 			this.bezierVectors[0] = fromLane.DestinationPoint;
-			this.bezierVectors[1] = firstPoint;
-			this.bezierVectors[2] = secondPoint;
-			this.bezierVectors[3] = toLane.SourcePoint; 
-			#endregion
+			this.bezierVectors[1] = new Vector(bezierPoints[1].X, bezierPoints[1].Y);
+			this.bezierVectors[2] = new Vector(bezierPoints[2].X, bezierPoints[2].Y);
+			this.bezierVectors[3] = toLane.SourcePoint;
 			#endregion
 
 			this.length = CalculateLength(30);
@@ -98,6 +93,40 @@ namespace TEN.Structures
 		#endregion
 
 		#region Private Methods
+		private PointF[] SetBezierPoints(Vector from, Vector to, Vector pointerFrom, Vector pointerTo)
+		{
+			PointF[] beziers = new PointF[4];
+
+			beziers[0] = from.ToPointF();
+			
+			Vector moveVector = new Vector(from, to);
+			Vector rotatedUnitary = new Vector(pointerFrom.X, pointerFrom.Y).Rotate90();
+			Vector firstPoint, secondPoint;
+			float denominator = rotatedUnitary * pointerTo;
+			if (Math.Abs(denominator) <= 0.1)
+			{
+				// Connected lanes are almost in the same direction.
+				firstPoint = from + moveVector * 0.33F;
+				secondPoint = from + moveVector * 0.67F;
+				beziers[1] = firstPoint.ToPointF();
+				beziers[2] = secondPoint.ToPointF();
+			}
+			else
+			{
+				float coefficient = rotatedUnitary * moveVector / denominator;
+				Vector intersection = to - coefficient * pointerTo;
+
+				firstPoint = from + (intersection - from) * 0.5F;
+				secondPoint = to - (to - intersection) * 0.5F;
+				beziers[1] = firstPoint.ToPointF();
+				beziers[2] = secondPoint.ToPointF();
+			}
+
+			beziers[3] = to.ToPointF();
+
+			return beziers;
+		}
+
 		/// <summary>
 		/// Calculate the approximate length of this lane.
 		/// </summary>
