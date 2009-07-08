@@ -269,6 +269,10 @@ namespace TEN.Forms
 					selectedEdge.MaximumSpeed = dialog.MaxSpeed;
 				}
 			}
+			else
+			{
+				SetParameters();
+			}
 		}
 
 		/// <summary>
