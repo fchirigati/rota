@@ -66,6 +66,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\SemaphoreDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SemaphoreDialog.Designer.cs">
+      <DependentUpon>SemaphoreDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\MaxSpeedDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MaxSpeedDialog.Designer.cs">
+      <DependentUpon>MaxSpeedDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FrmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,11 +90,11 @@
     <Compile Include="Forms\MapDrawer.Designer.cs">
       <DependentUpon>MapDrawer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\NumberDialog.cs">
+    <Compile Include="Forms\NewRoadDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\NumberDialog.Designer.cs">
-      <DependentUpon>NumberDialog.cs</DependentUpon>
+    <Compile Include="Forms\NewRoadDialog.Designer.cs">
+      <DependentUpon>NewRoadDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -93,6 +105,7 @@
     <Compile Include="Structures\Lane.cs" />
     <Compile Include="Structures\MapEdge.cs" />
     <Compile Include="Structures\MapNode.cs" />
+    <Compile Include="Structures\Semaphore.cs" />
     <Compile Include="Structures\Vector.cs" />
     <Compile Include="Structures\Vehicle.cs" />
     <Compile Include="Structures\ConnectionLane.cs" />
@@ -100,11 +113,20 @@
     <Compile Include="Structures\Enums.cs" />
     <Compile Include="TEN.cs" />
     <Compile Include="ThreadManagers\TrafficSimulator.cs" />
+    <Compile Include="Util\Polygons.cs" />
+    <EmbeddedResource Include="Forms\SemaphoreDialog.resx">
+      <DependentUpon>SemaphoreDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MaxSpeedDialog.resx">
+      <DependentUpon>MaxSpeedDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmMain.resx">
       <DependentUpon>FrmMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\NumberDialog.resx">
-      <DependentUpon>NumberDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\NewRoadDialog.resx">
+      <DependentUpon>NewRoadDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -206,6 +228,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="media\zoom_more.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\Button Close.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -44,6 +44,17 @@ namespace TEN.Structures
 			this.counter = 0;
 			this.flow = flowValue;
 		}
+
+		/// <summary>
+		/// Clones a MapNode object.
+		/// </summary>
+		/// <param name="mapNode">MapNode object to be cloned.</param>
+		/// <param name="flowValue">Flow of vehicles that this nodes generates.</param>
+		public FlowNode(MapNode mapNode, int flowValue)
+			: base(mapNode)
+		{
+			this.flow = flowValue;
+		}
 		#endregion
 
 		#region Public Methods
@@ -55,8 +66,9 @@ namespace TEN.Structures
 		{
 			if (counter * flow > TENApp.simulator.Random.Next(1000))
 			{
-				int lane = TENApp.simulator.Random.Next(OutEdges[0].Lanes.Count);
-				LinkedList<Vehicle> vehicles = OutEdges[0].Lanes[lane].Vehicles;
+				int edge = TENApp.simulator.Random.Next(OutEdges.Count);
+				int lane = TENApp.simulator.Random.Next(OutEdges[edge].Lanes.Count);
+				LinkedList<Vehicle> vehicles = OutEdges[edge].Lanes[lane].Vehicles;
 
 				lock (vehicles)
 				{
@@ -72,8 +84,8 @@ namespace TEN.Structures
 
 					if (!occupiedEntrance)
 					{
-						vehicles.AddFirst(new Vehicle(30, 10, 40, TENApp.simulator.Random.Next(40) + 40,
-							Color.White, OutEdges[0].Lanes[lane]));
+						vehicles.AddFirst(new Vehicle(30, 20, 100, TENApp.simulator.Random.Next(40) + 40,
+							Color.White, OutEdges[edge].Lanes[lane]));
 						counter = 0;
 					}
 				}

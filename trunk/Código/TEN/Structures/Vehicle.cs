@@ -108,39 +108,130 @@ namespace TEN.Structures
 		/// <param name="nextVehicle">Next vehicle in the lane. null if none</param>
 		public void SimulationStep(int simulationStep, Vehicle nextVehicle)
 		{
-			position += speed * simulationStep / 1000;
+			position += (speed * simulationStep) * 0.001F;
 
-			bool canIncreaseSpeed = false;
+			MapNode toNode = lane.Edge.ToNode;
+			bool canIncreaseSpeed = true;
+			bool shouldDecelerate = false;
+
+			// Next vehicle of this lane
 			if (nextVehicle != null)
 			{
-				if (nextVehicle.Position - position <= TENApp.simulator.SafetyDistance + length)
+				float distance = nextVehicle.Position - position - length;
+				float warningDistance = Math.Max(speed * TENApp.simulator.SafetyDistance * 0.1F,
+					TENApp.simulator.SafetyDistance);
+				//if (2 * distance * deceleration <= speed * speed - nextVehicle.Speed * nextVehicle.Speed)
+				if (distance <= warningDistance)
 				{
-					if (speed - deceleration > nextVehicle.speed)
-					{
-						speed = nextVehicle.speed;
-					}
-					else if (speed > nextVehicle.speed
-						|| nextVehicle.Position - position <= TENApp.simulator.SafetyDistance)
-					{
-						speed -= deceleration * simulationStep / 1000;
-					}
+					if (distance < TENApp.simulator.SafetyDistance || speed > nextVehicle.Speed)
+						shouldDecelerate = true;
 
-					if (speed < 0)
-						speed = 0;
-				}
-				else
-				{
-					canIncreaseSpeed = true;
+					canIncreaseSpeed = false;
 				}
 			}
-			else
+
+			// Next lane vehicle
+			if (canIncreaseSpeed && lane.ToLanes.Count > 0)
 			{
-				canIncreaseSpeed = true;
+				float warningDistance = Math.Max(speed * TENApp.simulator.SafetyDistance * 0.1F,
+					TENApp.simulator.SafetyDistance);
+				float distanceToNextLane = lane.Length - position - length;
+
+				foreach (Lane toLane in lane.ToLanes)
+				{
+					if (toLane.Vehicles.Count == 0)
+						continue;
+
+					Vehicle nextLaneVehicle = toLane.Vehicles.First.Value;
+					float distance = nextLaneVehicle.Position + distanceToNextLane;
+
+					if (distance <= warningDistance)
+					{
+						if (distance < TENApp.simulator.SafetyDistance || speed > nextLaneVehicle.Speed)
+							shouldDecelerate = true;
+
+						canIncreaseSpeed = false;
+						break;
+					}
+				}
 			}
 
+			// Occupied connection
+			if (!shouldDecelerate && toNode.OutEdges.Count > 0 && lane.GetType() != typeof(ConnectionLane))
+			{
+				float distance = lane.Length - position - length;
+				float warningDistance = Math.Max(speed * TENApp.simulator.SafetyDistance * 0.1F,
+					TENApp.simulator.SafetyDistance);
+
+				if (distance <= warningDistance && distance > 0 && toNode.OccupiedConnection(lane.Edge))
+				{
+					shouldDecelerate = true;
+					canIncreaseSpeed = false;
+				}
+			}
+
+			// Semaphore
+			if (!shouldDecelerate)
+			{
+				// No vehicles ahead in the warning distance of this lane.
+
+				Semaphore semaphore = toNode.Semaphore;
+				if (semaphore != Semaphore.NoSemaphore && lane.GetType() != typeof(ConnectionLane))
+				{
+					// Destination node has a semaphore.
+					float distance = lane.Length - position - length;
+					float warningDistance = Math.Max(speed * TENApp.simulator.SafetyDistance * 0.1F,
+						TENApp.simulator.SafetyDistance);
+
+					if (semaphore.CurrentEdge != lane.Edge || semaphore.CurrentEdgeState == Semaphore.State.Yellow)
+					{
+						// Traffic light is red or yellow.
+						if (distance <= warningDistance && distance > 0)
+						{
+							shouldDecelerate = true;
+							canIncreaseSpeed = false;
+						}
+					}
+				}
+			}
+
+			// Intersection without semaphore.
+			if (!shouldDecelerate && toNode.InEdges.Count > 1 && 
+				toNode.Semaphore == Semaphore.NoSemaphore && lane.GetType() != typeof(ConnectionLane))
+			{
+				float distance = lane.Length - position - length;
+				float warningDistance = Math.Max(speed * TENApp.simulator.SafetyDistance * 0.05F,
+					TENApp.simulator.SafetyDistance);
+
+				if (distance <= warningDistance)
+				{
+					if (toNode.WillEnter == null)
+					{
+						toNode.WillEnter = lane.Edge;
+					}
+					else if (toNode.WillEnter != lane.Edge)
+					{
+						shouldDecelerate = true;
+						canIncreaseSpeed = false;
+					}
+
+					if (speed > TENApp.simulator.WarningSpeed)
+					{
+						shouldDecelerate = true;
+						canIncreaseSpeed = false;
+					}
+				}
+			}
+
+			if (shouldDecelerate)
+			{
+				speed -= deceleration * simulationStep * 0.001F;
+				if (speed < 0)
+					speed = 0;
+			}
 			if (canIncreaseSpeed)
 			{
-				speed += acceleration * simulationStep / 1000;
+				speed += acceleration * simulationStep * 0.001F;
 				if (speed >= lane.Edge.MaximumSpeed)
 					speed = lane.Edge.MaximumSpeed;
 			}
@@ -155,11 +246,14 @@ namespace TEN.Structures
 				else
 				{
 					// Vehicle reached other edge.
+					if (toNode.WillEnter == lane.Edge)
+						toNode.WillEnter = null;
+
 					Lane destLane = lane.ToLanes[TENApp.simulator.Random.Next(lane.ToLanes.Count)];
 					
 					lock (destLane.Vehicles)
 					{
-						position = 0;
+						position -= lane.Length;
 						lane = destLane;
 						destLane.Vehicles.AddFirst(this);
 					}

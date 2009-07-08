@@ -109,8 +109,7 @@ namespace TEN
 				return;
 
 			TENApp.shutdownStarted = true;
-			lock (TENApp.refresher)
-				TENApp.running = false;
+			TENApp.running = false;
 
 			// Stop the threads.
 			TENApp.refresher.Stop();

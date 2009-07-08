@@ -100,14 +100,20 @@ namespace TEN.Structures
 			beziers[0] = from.ToPointF();
 			
 			Vector moveVector = new Vector(from, to);
+			float moveSize = moveVector.GetSize() * 0.333F;
+
+			beziers[1] = (from + pointerFrom * moveSize).ToPointF();
+			beziers[2] = (to - pointerTo * moveSize).ToPointF();
+			// usando intersecção
+#if false
 			Vector rotatedUnitary = new Vector(pointerFrom.X, pointerFrom.Y).Rotate90();
 			Vector firstPoint, secondPoint;
 			float denominator = rotatedUnitary * pointerTo;
 			if (Math.Abs(denominator) <= 0.1)
 			{
 				// Connected lanes are almost in the same direction.
-				firstPoint = from + moveVector * 0.33F;
-				secondPoint = from + moveVector * 0.67F;
+				firstPoint = from + moveVector * 0.333F;
+				secondPoint = from + moveVector * 0.667F;
 				beziers[1] = firstPoint.ToPointF();
 				beziers[2] = secondPoint.ToPointF();
 			}
@@ -120,7 +126,8 @@ namespace TEN.Structures
 				secondPoint = to - (to - intersection) * 0.5F;
 				beziers[1] = firstPoint.ToPointF();
 				beziers[2] = secondPoint.ToPointF();
-			}
+			} 
+#endif
 
 			beziers[3] = to.ToPointF();
 
