@@ -64,7 +64,7 @@ namespace TEN.Structures
 		/// <param name="simulationStep">Simulation step value.</param>
 		public void SimulationStep(int simulationStep)
 		{
-			if (counter * flow > TENApp.simulator.Random.Next(1000))
+			if (2 * counter * flow > TENApp.simulator.Random.Next(1000))
 			{
 				int edge = TENApp.simulator.Random.Next(OutEdges.Count);
 				int lane = TENApp.simulator.Random.Next(OutEdges[edge].Lanes.Count);
@@ -72,17 +72,8 @@ namespace TEN.Structures
 
 				lock (vehicles)
 				{
-					bool occupiedEntrance = false;
-					foreach (Vehicle vehicle in vehicles)
-					{
-						if (vehicle.Position < TENApp.simulator.SafetyDistance + vehicle.Length)
-						{
-							occupiedEntrance = true;
-							break;
-						}
-					}
-
-					if (!occupiedEntrance)
+					if (vehicles.Count == 0 ||
+						vehicles.First.Value.Position > 2 * TENApp.simulator.SafetyDistance + vehicles.First.Value.Length)
 					{
 						vehicles.AddFirst(new Vehicle(30, 20, 100, TENApp.simulator.Random.Next(40) + 40,
 							Color.White, OutEdges[edge].Lanes[lane]));
@@ -91,7 +82,7 @@ namespace TEN.Structures
 				}
 			}
 			else
-				counter += (float)simulationStep / 1000;
+				counter += simulationStep * 0.001F;
 		}
 		#endregion
 	}

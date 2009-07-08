@@ -27,6 +27,11 @@ namespace TEN.Forms
 		{
 			get { return int.Parse(maxSpeed.Text); }
 		}
+
+		/// <summary>
+		/// States if the user clicked the cancel button.
+		/// </summary>
+		private bool cancelled;
 		#endregion
 
 		#region Constructors
@@ -37,6 +42,7 @@ namespace TEN.Forms
 		{
 			InitializeComponent();
 			this.lanesNumber.Focus();
+			this.cancelled = false;
 		}
 		#endregion
 
@@ -49,6 +55,25 @@ namespace TEN.Forms
 			base.OnActivated(e);
 
 			lanesNumber.Focus();
+		}
+
+		private void NewRoadDialog_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (e.CloseReason == CloseReason.UserClosing || cancelled)
+				return;
+
+			int value1, value2;
+			if (!int.TryParse(maxSpeed.Text, out value1) || !int.TryParse(lanesNumber.Text, out value2) ||
+				value1 < 0 || value1 > 200 || value2 < 1 || value2 > 5)
+			{
+				e.Cancel = true;
+				MessageBox.Show("Invalid input value.", "TEN - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+		}
+
+		private void btnCancel_Click(object sender, EventArgs e)
+		{
+			cancelled = true;
 		}
 		#endregion
 	}

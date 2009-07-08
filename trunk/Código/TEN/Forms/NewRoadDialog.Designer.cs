@@ -96,6 +96,7 @@
 			this.btnCancel.TabIndex = 5;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
+			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 			// 
 			// label2
 			// 
@@ -130,6 +131,7 @@
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "New Road";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NewRoadDialog_FormClosing);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

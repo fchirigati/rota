@@ -57,12 +57,12 @@ namespace TEN.Forms
 		}
 		#endregion
 
-		#region Private Methods
+		#region Public Methods
 		/// <summary>
 		/// Sets a new state to the application, making the necessary changes.
 		/// </summary>
 		/// <param name="newState">New state of the application.</param>
-		private void SetState(AppState newState)
+		public void SetState(AppState newState)
 		{
 			if (TENApp.state == newState)
 				return;
@@ -84,6 +84,8 @@ namespace TEN.Forms
 					pauseToolStripMenuItem.Enabled = true;
 					stopToolStripMenuItem1.Enabled = true;
 					restartToolStripMenuItem1.Enabled = true;
+					reportToolStripMenuItem.Enabled = false;
+					optionsToolStripMenuItem1.Enabled = false;
 
 					btnNewRoad.Enabled = false;
 					btnNewTrafficLight.Enabled = false;
@@ -112,6 +114,8 @@ namespace TEN.Forms
 					pauseToolStripMenuItem.Enabled = false;
 					stopToolStripMenuItem1.Enabled = true;
 					restartToolStripMenuItem1.Enabled = true;
+					reportToolStripMenuItem.Enabled = true;
+					optionsToolStripMenuItem1.Enabled = true;
 
 					btnNewRoad.Enabled = false;
 					btnNewTrafficLight.Enabled = false;
@@ -140,6 +144,8 @@ namespace TEN.Forms
 					pauseToolStripMenuItem.Enabled = false;
 					stopToolStripMenuItem1.Enabled = false;
 					restartToolStripMenuItem1.Enabled = false;
+					reportToolStripMenuItem.Enabled = false;
+					optionsToolStripMenuItem1.Enabled = true;
 
 					btnPointer.Enabled = true;
 					btnNewRoad.Enabled = true;
@@ -177,7 +183,9 @@ namespace TEN.Forms
 					break;
 			}
 		}
+		#endregion
 
+		#region Private Methods
 		/// <summary>
 		/// TO-DO
 		/// </summary>
@@ -195,6 +203,9 @@ namespace TEN.Forms
 		{
 			button.Checked = false;
 		}
+
+
+		
 		#endregion
 
 		#region Event Handlers
@@ -282,7 +293,7 @@ namespace TEN.Forms
 
 		private void optionsToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
-
+			mapDrawer.SetParameters();
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -292,7 +303,13 @@ namespace TEN.Forms
 
 		private void reportToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			mapDrawer.ShowReport();
+		}
 
+		private void mapDrawer_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Delete)
+				btnDelete_Click(sender, e);
 		}
 		#endregion
 	}

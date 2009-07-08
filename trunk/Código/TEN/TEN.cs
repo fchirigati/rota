@@ -67,6 +67,7 @@ namespace TEN
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
+		[STAThread]
 		static void Main()
 		{
 			Application.EnableVisualStyles();
@@ -75,7 +76,6 @@ namespace TEN
 			TENApp.frmMain.Show();
 			TENApp.running = true;
 			TENApp.shutdownStarted = false;
-			TENApp.state = AppState.EditingPointer;
 
 			TENApp.threadMain = Thread.CurrentThread;
 			TENApp.threadMain.Name = "MainThread";
@@ -95,6 +95,7 @@ namespace TEN
 			TENApp.threadRefresher.Start();
 			#endregion
 
+			TENApp.frmMain.SetState(AppState.EditingPointer);
 			Application.Run(frmMain);
 		}
 		#endregion
