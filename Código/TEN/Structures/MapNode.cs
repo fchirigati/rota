@@ -43,6 +43,26 @@ namespace TEN.Structures
 		{
 			get { return outEdges; }
 		}
+
+		private Semaphore semaphore;
+		/// <summary>
+		/// Semaphore object associated with this node.
+		/// </summary>
+		public Semaphore Semaphore
+		{
+			get { return semaphore; }
+			set { semaphore = value; }
+		}
+
+		private MapEdge willEnter;
+		/// <summary>
+		/// Edge that has cars willing to enter the node.
+		/// </summary>
+		public MapEdge WillEnter
+		{
+			get { return willEnter; }
+			set { willEnter = value; }
+		}
 		#endregion
 
 		#region Constructors
@@ -56,6 +76,8 @@ namespace TEN.Structures
 			this.point = new Point((int)positionX, (int)positionY);
 			this.inEdges = new List<MapEdge>();
 			this.outEdges = new List<MapEdge>();
+			this.semaphore = Semaphore.NoSemaphore;
+			this.willEnter = null;
 		}
 
 		/// <summary>
@@ -76,10 +98,47 @@ namespace TEN.Structures
 			this.point.Y = mapNode.Point.Y;
 			this.inEdges = mapNode.inEdges;
 			this.outEdges = mapNode.outEdges;
+			this.semaphore = mapNode.semaphore;
+			this.willEnter = null;
 		}
 		#endregion
 
 		#region Public Methods
+		/// <summary>
+		/// States if any connection edge of this node other than the 
+		/// connection edge formed by the given edge is occupied.
+		/// </summary>
+		/// <param name="excludeEdge">Edge to be excluded when verifying if the connections are occupied.</param>
+		public bool OccupiedConnection(MapEdge excludeEdge)
+		{
+			bool occupied = false;
+			foreach (MapEdge edge in inEdges)
+			{
+				if (edge == excludeEdge)
+					continue;
+
+				foreach (Lane lane in edge.Lanes)
+				{
+					foreach (ConnectionLane connLane in lane.ToLanes)
+					{
+						if (connLane.Vehicles.Count > 0)
+						{
+							occupied = true;
+							break;
+						}
+					}
+
+					if (occupied)
+						break;
+				}
+
+				if (occupied)
+					break;
+			}
+
+			return occupied;
+		}
+
 		/// <summary>
 		/// Evaluates the distance between this node and other point.
 		/// </summary>

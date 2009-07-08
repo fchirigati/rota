@@ -21,6 +21,22 @@ namespace TEN.Forms
 		{
 			get { return running; }
 		}
+
+		/// <summary>
+		/// Gets the status bar object used in the window.
+		/// </summary>
+		public ToolStripStatusLabel StatusBar
+		{
+			get { return statusBar; }
+		}
+
+		/// <summary>
+		/// Gets the MapDrawer object used in the window.
+		/// </summary>
+		public MapDrawer Drawer
+		{
+			get { return mapDrawer; }
+		}
 		#endregion
 
 		#region Constructors
@@ -51,20 +67,28 @@ namespace TEN.Forms
 			if (TENApp.state == newState)
 				return;
 
-			mapDrawer.ClearClickedPoints();
+			mapDrawer.ResetSelections();
 			TENApp.state = newState;
 
 			switch (newState)
 			{
 				case AppState.SimulationRunning:
-					mapDrawer.ClearClickedPoints();
+					mapDrawer.ResetSelections();
 
 					CheckButton(btnPointer);
 					UncheckButton(btnNewRoad);
 					UncheckButton(btnNewTrafficLight);
 
+					newToolStripMenuItem.Enabled = false;
+					playToolStripMenuItem.Enabled = false;
+					pauseToolStripMenuItem.Enabled = true;
+					stopToolStripMenuItem1.Enabled = true;
+					restartToolStripMenuItem1.Enabled = true;
+
 					btnNewRoad.Enabled = false;
 					btnNewTrafficLight.Enabled = false;
+					btnConfigure.Enabled = false;
+					btnDelete.Enabled = false;
 					btnStart.Enabled = false;
 					btnPause.Enabled = true;
 					btnStop.Enabled = true;
@@ -77,14 +101,22 @@ namespace TEN.Forms
 					if (TENApp.simulator.IsSimulating)
 						TENApp.simulator.Pause();
 
-					mapDrawer.ClearClickedPoints();
+					mapDrawer.ResetSelections();
 
 					CheckButton(btnPointer);
 					UncheckButton(btnNewRoad);
 					UncheckButton(btnNewTrafficLight);
 
+					newToolStripMenuItem.Enabled = false;
+					playToolStripMenuItem.Enabled = true;
+					pauseToolStripMenuItem.Enabled = false;
+					stopToolStripMenuItem1.Enabled = true;
+					restartToolStripMenuItem1.Enabled = true;
+
 					btnNewRoad.Enabled = false;
 					btnNewTrafficLight.Enabled = false;
+					btnConfigure.Enabled = false;
+					btnDelete.Enabled = false;
 					btnStart.Enabled = true;
 					btnPause.Enabled = false;
 					btnStop.Enabled = true;
@@ -94,16 +126,26 @@ namespace TEN.Forms
 				case AppState.EditingPointer:
 					if (TENApp.simulator.IsSimulating)
 						TENApp.simulator.Stop();
+					else
+						TENApp.simulator.Reset();
 
-					mapDrawer.ClearClickedPoints();
+					mapDrawer.ResetSelections();
 
 					CheckButton(btnPointer);
 					UncheckButton(btnNewRoad);
 					UncheckButton(btnNewTrafficLight);
 
+					newToolStripMenuItem.Enabled = true;
+					playToolStripMenuItem.Enabled = true;
+					pauseToolStripMenuItem.Enabled = false;
+					stopToolStripMenuItem1.Enabled = false;
+					restartToolStripMenuItem1.Enabled = false;
+
 					btnPointer.Enabled = true;
 					btnNewRoad.Enabled = true;
 					btnNewTrafficLight.Enabled = true;
+					btnConfigure.Enabled = true;
+					btnDelete.Enabled = true;
 					btnStart.Enabled = true;
 					btnPause.Enabled = false;
 					btnStop.Enabled = false;
@@ -113,6 +155,8 @@ namespace TEN.Forms
 					break;
 
 				case AppState.EditingNewRoad:
+					mapDrawer.ResetSelections();
+
 					UncheckButton(btnPointer);
 					CheckButton(btnNewRoad);
 					UncheckButton(btnNewTrafficLight);
@@ -120,7 +164,9 @@ namespace TEN.Forms
 					break;
 
 				case AppState.EditingNewTrafficLight:
-					mapDrawer.ClearClickedPoints();
+					mapDrawer.ResetSelections();
+
+					mapDrawer.ResetSelections();
 					UncheckButton(btnPointer);
 					UncheckButton(btnNewRoad);
 					CheckButton(btnNewTrafficLight);
@@ -212,6 +258,41 @@ namespace TEN.Forms
 				mapDrawer.Zoom -= 0.1F;
 
 			mapDrawer.Refresh();
+		}
+
+		private void btnDelete_Click(object sender, EventArgs e)
+		{
+			TENApp.simulator.DeleteEdge();
+			TENApp.simulator.DeleteSemaphore();
+
+			mapDrawer.Refresh();
+		}
+
+		private void btnConfigure_Click(object sender, EventArgs e)
+		{
+			mapDrawer.Configure();
+		}
+
+		private void newToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			TENApp.simulator.Clear();
+			mapDrawer.Refresh();
+			SetState(AppState.EditingPointer);
+		}
+
+		private void optionsToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Close();
+		}
+
+		private void reportToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+
 		}
 		#endregion
 	}

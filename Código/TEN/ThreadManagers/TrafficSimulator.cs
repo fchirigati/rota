@@ -15,12 +15,32 @@ namespace TEN
 		/// <summary>
 		/// Width of each lane (in pixels).
 		/// </summary>
-		public const int LaneWidth = 26;
+		public const int LaneWidth = 28;
 
 		/// <summary>
 		/// Width of the vehicles (in pixels).
 		/// </summary>
 		public const int VehicleWidth = 14;
+
+		/// <summary>
+		/// Default semaphore temporization (in seconds).
+		/// </summary>
+		public const int DefaultSemaphorePause = 10;
+
+		/// <summary>
+		/// Default safety distance (in pixels).
+		/// </summary>
+		public const int DefaultSafetyDistance = 15;
+
+		/// <summary>
+		/// Default warning speed.
+		/// </summary>
+		public const int DefaultWarningSpeed = 40;
+
+		/// <summary>
+		/// Default flow value.
+		/// </summary>
+		public const int DefaultFlowValue = 15;
 		#endregion
 
 		#region Fields
@@ -113,6 +133,15 @@ namespace TEN
 		{
 			get { return connectionEdges; }
 		}
+
+		private List<TEN.Structures.Semaphore> semaphores;
+		/// <summary>
+		/// Semaphores of the map.
+		/// </summary>
+		public List<TEN.Structures.Semaphore> Semaphores
+		{
+			get { return semaphores; }
+		}
 		#endregion
 
 		private int safetyDistance;
@@ -123,6 +152,26 @@ namespace TEN
 		{
 			get { return safetyDistance; }
 			set { safetyDistance = value; }
+		}
+
+		private int warningSpeed;
+		/// <summary>
+		/// Maximum speed of a vehicle when entering a road intersection.
+		/// </summary>
+		public int WarningSpeed
+		{
+			get { return warningSpeed; }
+			set { warningSpeed = value; }
+		}
+
+		private int flowValue;
+		/// <summary>
+		/// Value of the flow of vehicles that enters the map.
+		/// </summary>
+		public int FlowValue
+		{
+			get { return flowValue; }
+			set { flowValue = value; }
 		}
 		#endregion
 
@@ -141,8 +190,11 @@ namespace TEN
 			this.flowNodes = new List<FlowNode>();
 			this.simulationStepTime = 60;
 			this.simulationDelay = 30;
-			this.safetyDistance = 15;
 			this.connectionEdges = new List<MapEdge>();
+			this.semaphores = new List<TEN.Structures.Semaphore>();
+			this.safetyDistance = DefaultSafetyDistance;
+			this.warningSpeed = DefaultWarningSpeed;
+			this.flowValue = DefaultFlowValue;
 		}
 		#endregion
 
@@ -194,7 +246,126 @@ namespace TEN
 
 			isSimulating = false;
 
-			// TO-DO: Encapsular em métodos de Clear.
+			// TO-DO: Encapsular em métodos de Reset.
+			Reset();
+		}
+
+		/// <summary>
+		/// Pauses the simulation.
+		/// </summary>
+		public void Pause()
+		{
+			if (!isSimulating)
+				return;
+
+			isSimulating = false;
+		}
+
+		/// <summary>
+		/// Deletes the current selected edge.
+		/// </summary>
+		public void DeleteEdge()
+		{
+			MapEdge edge = TENApp.frmMain.Drawer.SelectedEdge;
+			if (edge == null) 
+				return;
+
+			edges.Remove(edge);
+			edge.ToNode.InEdges.Remove(edge);
+			edge.FromNode.OutEdges.Remove(edge);
+			foreach (MapEdge connEdge in edge.InConnections)
+			{
+				connectionEdges.Remove(connEdge);
+				foreach (MapEdge inEdge in edge.FromNode.InEdges)
+				{
+					foreach (Lane lane in inEdge.Lanes)
+					{
+						List<Lane> toRemove = new List<Lane>();
+						foreach (Lane connLane in lane.ToLanes)
+						{
+							if (connEdge.Lanes.Contains(connLane))
+								toRemove.Add(connLane);
+						}
+
+						foreach (Lane remLane in toRemove)
+							lane.ToLanes.Remove(remLane);
+					}
+
+					inEdge.OutConnections.Remove(connEdge);
+				}
+			}
+			foreach (MapEdge connEdge in edge.OutConnections)
+			{
+				connectionEdges.Remove(connEdge);
+				foreach (MapEdge outEdge in edge.ToNode.OutEdges)
+				{
+					outEdge.InConnections.Remove(connEdge);
+				}
+			}
+
+			foreach (MapEdge trimmedEdge in edge.FromNode.InEdges)
+			{
+				trimmedEdge.TrimToEdge();
+			}
+			foreach (MapEdge trimmedEdge in edge.ToNode.OutEdges)
+			{
+				trimmedEdge.TrimFromEdge();
+			}
+
+			if (edge.ToNode.Semaphore != TEN.Structures.Semaphore.NoSemaphore)
+			{
+				if (edge.ToNode.InEdges.Count > 0)
+					edge.ToNode.Semaphore.RefreshNode();
+				else
+				{
+					semaphores.Remove(edge.ToNode.Semaphore);
+					edge.ToNode.Semaphore = null;
+				}
+			}
+			if (edge.ToNode.InEdges.Count == 0)
+			{
+				if (edge.ToNode.OutEdges.Count > 0)
+				{
+					FlowNode newNode = new FlowNode(edge.ToNode, flowValue);
+					foreach (MapEdge outEdge in edge.ToNode.OutEdges)
+						outEdge.FromNode = newNode;
+
+					nodes.Add(newNode);
+					flowNodes.Add(newNode);
+				}
+
+				nodes.Remove(edge.ToNode);
+				semaphores.Remove(edge.ToNode.Semaphore);
+			}
+			if (edge.FromNode.InEdges.Count == 0 && edge.FromNode.OutEdges.Count == 0)
+			{
+				nodes.Remove(edge.FromNode);
+				semaphores.Remove(edge.FromNode.Semaphore);
+				if (edge.FromNode.GetType() == typeof(FlowNode))
+					flowNodes.Remove((FlowNode)edge.FromNode);
+			}
+
+			TENApp.frmMain.Drawer.SelectedEdge = null;
+		}
+
+		/// <summary>
+		/// Deletes the current selected node's semaphore.
+		/// </summary>
+		public void DeleteSemaphore()
+		{
+			MapNode node = TENApp.frmMain.Drawer.SelectedNode;
+			if (node == MapNode.NoNode)
+				return;
+
+			semaphores.Remove(node.Semaphore);
+			node.Semaphore = null;
+		}
+
+		/// <summary>
+		/// Resets the simulation to the initial state.
+		/// </summary>
+		public void Reset()
+		{
 			foreach (MapEdge edge in edges)
 				foreach (Lane lane in edge.Lanes)
 					lock (lane.Vehicles)
@@ -207,17 +378,24 @@ namespace TEN
 
 			foreach (FlowNode node in flowNodes)
 				node.Counter = 0;
+
+			foreach (TEN.Structures.Semaphore semaphore in semaphores)
+				semaphore.Reset();
 		}
 
 		/// <summary>
-		/// Pauses the simulation.
+		/// Clears all map elements.
 		/// </summary>
-		public void Pause()
+		public void Clear()
 		{
-			if (!isSimulating)
-				return;
-
-			isSimulating = false;
+			edges.Clear();
+			nodes.Clear();
+			flowNodes.Clear();
+			connectionEdges.Clear();
+			semaphores.Clear();
+			safetyDistance = DefaultSafetyDistance;
+			warningSpeed = DefaultWarningSpeed;
+			flowValue = DefaultFlowValue;
 		}
 		#endregion
 
@@ -235,6 +413,9 @@ namespace TEN
 
 			foreach (FlowNode node in flowNodes)
 				node.SimulationStep(simulationStepTime);
+
+			foreach (TEN.Structures.Semaphore semaphore in semaphores)
+				semaphore.SimulationStep(simulationStepTime);
 		}
 		#endregion
 	}

@@ -55,6 +55,17 @@ namespace TEN.Structures
 		}
 
 		/// <summary>
+		/// Creates a vector based on two points.
+		/// </summary>
+		/// <param name="from">The point that this vector comes from.</param>
+		/// <param name="to">The point that this vector is pointing to.</param>
+		public Vector(PointF from, PointF to)
+		{
+			this.x = to.X - from.X;
+			this.y = to.Y - from.Y;
+		}
+
+		/// <summary>
 		/// Creates a vector based on two vectors.
 		/// </summary>
 		/// <param name="from">The point that this vector comes from.</param>
@@ -102,6 +113,14 @@ namespace TEN.Structures
 		}
 
 		/// <summary>
+		/// Returns the size of this vector.
+		/// </summary>
+		public float GetSize()
+		{
+			return (float)Math.Sqrt(x * x + y * y);
+		}
+
+		/// <summary>
 		/// Returns the euclidean distance between this vector (as a point) and another one.
 		/// </summary>
 		/// <param name="secondVector">Vector to be compared.</param>
@@ -118,6 +137,9 @@ namespace TEN.Structures
 			return (new Point((int)x, (int)y));
 		}
 
+		/// <summary>
+		/// Returns the PointF-equivalent object of this Vector.
+		/// </summary>
 		public PointF ToPointF()
 		{
 			return new PointF(x, y);
@@ -134,6 +156,15 @@ namespace TEN.Structures
 			y /= size;
 
 			return this;
+		}
+
+		/// <summary>
+		/// Returns a new vector struct rotated by 90 degrees.
+		/// </summary>
+		public Vector NewRotated90()
+		{
+			Vector newVec = new Vector(x, y);
+			return newVec.Rotate90();
 		}
 
 		/// <summary>

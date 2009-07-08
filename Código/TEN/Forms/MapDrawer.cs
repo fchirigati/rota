@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Windows.Forms;
-using TEN.Structures;
-using TEN;
 using System.Threading;
+using System.Windows.Forms;
+using TEN;
+using TEN.Structures;
+using TEN.Util;
 
 namespace TEN.Forms
 {
@@ -31,6 +32,7 @@ namespace TEN.Forms
 		private readonly Color colorNode;
 		private readonly Color colorSelectedNode;
 		private readonly Color colorHoveredNode;
+		private readonly Color colorFlowNode;
 
 		private readonly Pen penRoad;
 		private readonly Pen penRoadContour;
@@ -40,11 +42,23 @@ namespace TEN.Forms
 		private readonly Pen penNode;
 		private readonly Pen penHoveredNode;
 		private readonly Pen penSelectedNode;
+		private readonly Pen penFlowNode;
+		private readonly Pen penLightBorder;
 
 		private readonly Brush brushRoad;
 		private readonly Brush brushNode;
 		private readonly Brush brushHoveredNode;
 		private readonly Brush brushSelectedNode;
+		private readonly Brush brushHoveredEdge;
+		private readonly Brush brushFlowNode;
+		private readonly Brush brushSelectedEdge;
+		private readonly Brush brushRedLight;
+		private readonly Brush brushYellowLight;
+		private readonly Brush brushGreenLight;
+		private readonly Brush brushRedLightOff;
+		private readonly Brush brushYellowLightOff;
+		private readonly Brush brushGreenLightOff;
+		private readonly Brush brushSemaphore;
 		#endregion
 
 		#region Fields
@@ -111,10 +125,29 @@ namespace TEN.Forms
 		/// </summary>
 		private MapNode hoveredNode;
 
+		private MapNode selectedNode;
 		/// <summary>
 		/// Reference to the current selected map node. null if there are no hovered nodes.
 		/// </summary>
-		private MapNode selectedNode;
+		public MapNode SelectedNode
+		{
+			get { return selectedNode; }
+		}
+
+		/// <summary>
+		/// Reference to the current hovered edge. null if there are no hovered edges.
+		/// </summary>
+		private MapEdge hoveredEdge;
+
+		private MapEdge selectedEdge;
+		/// <summary>
+		/// Reference to the current selected edge. null if there are no hovered edges.
+		/// </summary>
+		public MapEdge SelectedEdge
+		{
+			set { selectedEdge = value; }
+			get { return selectedEdge; }
+		}
 
 		/// <summary>
 		/// List of temporary clicked points.
@@ -131,24 +164,36 @@ namespace TEN.Forms
 			#region Readonly Fields
 			this.colorRoad = Color.LightGray;
 			this.colorNode = Color.Blue;
-			this.colorHoveredNode = Color.Blue;
+			this.colorHoveredNode = Color.MidnightBlue;
 			this.colorSelectedNode = Color.Red;
+			this.colorFlowNode = Color.Green;
 
 			this.penRoad = new Pen(colorRoad, Simulator.LaneWidth);
 			this.penRoadContour = new Pen(Color.Black, 3);
 			this.penVehicleContour = new Pen(Color.Black, 2);
 			this.penLaneSeparator = new Pen(Color.White, 2);
-			//this.penLaneSeparator.DashStyle = DashStyle.Custom;
 			this.penLaneSeparator.DashPattern = new float[]{5.0F, 10.0F};
 			this.penRoadSketch = new Pen(Color.FromArgb(128, colorRoad), Simulator.LaneWidth);
 			this.penNode = new Pen(colorNode, 1);
 			this.penSelectedNode = new Pen(colorSelectedNode, 1);
 			this.penHoveredNode = new Pen(colorHoveredNode, 1);
+			this.penFlowNode = new Pen(colorFlowNode, 1);
+			this.penLightBorder = new Pen(Color.White, 1);
 
 			this.brushRoad = new SolidBrush(colorRoad);
 			this.brushNode = new SolidBrush(Color.FromArgb(32, colorNode));
 			this.brushHoveredNode = new SolidBrush(Color.FromArgb(128, colorHoveredNode));
 			this.brushSelectedNode = new SolidBrush(Color.FromArgb(32, colorSelectedNode));
+			this.brushFlowNode = new SolidBrush(Color.FromArgb(32, colorFlowNode));
+			this.brushHoveredEdge = new SolidBrush(Color.FromArgb(64, Color.Blue));
+			this.brushSelectedEdge = new SolidBrush(Color.FromArgb(64, Color.Red));
+			this.brushRedLight = new SolidBrush(Color.Red);
+			this.brushYellowLight = new SolidBrush(Color.Yellow);
+			this.brushGreenLight = new SolidBrush(Color.Lime);
+			this.brushRedLightOff = new SolidBrush(Color.FromArgb(64, Color.Red));
+			this.brushYellowLightOff = new SolidBrush(Color.FromArgb(64, Color.Yellow));
+			this.brushGreenLightOff = new SolidBrush(Color.FromArgb(64, Color.Lime));
+			this.brushSemaphore = new SolidBrush(Color.FromArgb(144, Color.Black));
 			#endregion
 
 			// Initialize fields.
@@ -160,6 +205,8 @@ namespace TEN.Forms
 			this.snapOffset = 12;
 			this.hoveredNode = MapNode.NoNode;
 			this.selectedNode = MapNode.NoNode;
+			this.hoveredEdge = null;
+			this.selectedEdge = null;
 			this.clickedNodes = new List<MapNode>();
 
 			// Design methods.
@@ -175,12 +222,48 @@ namespace TEN.Forms
 
 		#region Public Methods
 		/// <summary>
-		/// Clears the clicked points list.
+		/// Clears the clicked points list and the selections.
 		/// </summary>
-		public void ClearClickedPoints()
+		public void ResetSelections()
 		{
 			clickedNodes.Clear();
 			selectedNode = MapNode.NoNode;
+			selectedEdge = null;
+		}
+
+		/// <summary>
+		/// Method called to configure the selected item or the general settings if no items are selected.
+		/// </summary>
+		public void Configure()
+		{
+			if (selectedNode != null)
+			{
+				TEN.Structures.Semaphore semaphore = selectedNode.Semaphore;
+				if (semaphore == TEN.Structures.Semaphore.NoSemaphore)
+					return;
+
+				SemaphoreDialog dialog = new SemaphoreDialog(semaphore.CycleInterval,
+					semaphore.Temporization);
+				DialogResult result = dialog.ShowDialog();
+
+				if (result == DialogResult.OK)
+				{
+					semaphore.CycleInterval = dialog.CycleInterval;
+					semaphore.Temporization.Clear();
+					foreach (KeyValuePair<MapEdge, int> kvp in dialog.TemporizationCopy)
+						semaphore.Temporization.Add(kvp);
+				}
+			}
+			else if (selectedEdge != null)
+			{
+				MaxSpeedDialog dialog = new MaxSpeedDialog(selectedEdge.MaximumSpeed);
+				DialogResult result = dialog.ShowDialog();
+
+				if (result == DialogResult.OK)
+				{
+					selectedEdge.MaximumSpeed = dialog.MaxSpeed;
+				}
+			}
 		}
 		#endregion
 
@@ -201,15 +284,47 @@ namespace TEN.Forms
 			DrawRoads(graphics);
 			DrawRoadSeparators(graphics);
 			DrawVehicles(graphics);
-			DrawNodes(graphics);
+			DrawSemaphores(graphics);
 
 			// Mode-exclusive drawings.
 			switch (TENApp.state)
 			{
 				case AppState.EditingPointer:
+					DrawNodes(graphics);
+
+					if (selectedEdge != null)
+					{
+						foreach (PointF[] quadrangle in selectedEdge.Boundings)
+							graphics.FillPolygon(brushSelectedEdge, quadrangle);
+					}
+
+					if (hoveredNode == MapNode.NoNode)
+					{
+						if (hoveredEdge != null && !hoveredEdge.PointInsideEdge(mouseX, mouseY))
+							hoveredEdge = null;
+
+						if (hoveredEdge == null)
+						{
+							foreach (MapEdge edge in TENApp.simulator.Edges)
+							{
+								if (edge.PointInsideEdge(mouseX, mouseY))
+								{
+									hoveredEdge = edge;
+									break;
+								}
+							}
+						}
+
+						if (hoveredEdge != null && hoveredEdge != selectedEdge)
+						{
+							foreach (PointF[] quadrangle in hoveredEdge.Boundings)
+								graphics.FillPolygon(brushHoveredEdge, quadrangle);
+						}
+					}
 					break;
 
 				case AppState.EditingNewRoad:
+					DrawNodes(graphics);
 					if (clickedNodes.Count > 0)
 					{
 						DrawNode(graphics, clickedNodes[0]);
@@ -225,6 +340,13 @@ namespace TEN.Forms
 					break;
 
 				case AppState.EditingNewTrafficLight:
+					DrawNodes(graphics);
+
+					if (selectedEdge != null)
+					{
+						foreach (PointF[] quadrangle in selectedEdge.Boundings)
+							graphics.FillPolygon(brushSelectedEdge, quadrangle);
+					}
 					break;
 			}
 		}
@@ -332,6 +454,11 @@ namespace TEN.Forms
 				nodePen = penHoveredNode;
 				nodeBrush = brushHoveredNode;
 			}
+			else if (node.GetType() == typeof(FlowNode))
+			{
+				nodePen = penFlowNode;
+				nodeBrush = brushFlowNode;
+			}
 			else
 			{
 				nodePen = penNode;
@@ -383,11 +510,76 @@ namespace TEN.Forms
 		}
 
 		/// <summary>
+		/// Draws the semaphores that are in the map.
+		/// </summary>
+		/// <param name="graphics">Graphics object that will be used to draw the semaphores.</param>
+		private void DrawSemaphores(Graphics graphics)
+		{
+			foreach (TEN.Structures.Semaphore semaphore in TENApp.simulator.Semaphores)
+				DrawSemaphore(graphics, semaphore);
+		}
+
+		/// <summary>
+		/// Draws a semaphore in the map based on a given Semaphore object.
+		/// </summary>
+		/// <param name="graphics">The Graphics object that will be used to draw the semaphore.</param>
+		/// <param name="semaphore">The Semaphore object to be drawed.</param>
+		private void DrawSemaphore(Graphics graphics, TEN.Structures.Semaphore semaphore)
+		{
+			foreach (KeyValuePair<MapEdge, int> kvp in semaphore.Temporization)
+			{
+				MapEdge edge = kvp.Key;
+				Brush brushRed = brushRedLight;
+				Brush brushYellow = brushYellowLightOff;
+				Brush brushGreen = brushGreenLightOff;
+				PointF position = edge.Lanes[0].DestinationPoint.ToPointF();
+
+				if (semaphore.CurrentEdge == edge)
+				{
+					switch (semaphore.CurrentEdgeState)
+					{
+						case TEN.Structures.Semaphore.State.Red:
+							brushRed = brushRedLight;
+							brushYellow = brushYellowLightOff;
+							brushGreen = brushGreenLightOff;
+							break;
+
+						case TEN.Structures.Semaphore.State.Yellow:
+							brushRed = brushRedLightOff;
+							brushYellow = brushYellowLight;
+							brushGreen = brushGreenLightOff;
+							break;
+
+						case TEN.Structures.Semaphore.State.Green:
+							brushRed = brushRedLightOff;
+							brushYellow = brushYellowLightOff;
+							brushGreen = brushGreenLight;
+							break;
+					}
+				}
+
+				//graphics.DrawRectangle(penLightBorder, position.X - 6, position.Y - 6, 12, 34);
+				graphics.FillRectangle(brushSemaphore, position.X - 5, position.Y - 5, 10, 32);
+				graphics.DrawEllipse(penLightBorder, position.X - 4, position.Y - 4, 8, 8);
+				graphics.FillEllipse(brushGreen, position.X - 3, position.Y - 3, 6, 6);
+				graphics.DrawEllipse(penLightBorder, position.X - 4, position.Y + 7, 8, 8);
+				graphics.FillEllipse(brushYellow, position.X - 3, position.Y + 8, 6, 6);
+				graphics.DrawEllipse(penLightBorder, position.X - 4, position.Y + 17, 8, 8);
+				graphics.FillEllipse(brushRed, position.X - 3, position.Y + 18, 6, 6);
+			}
+			
+		}
+
+		/// <summary>
 		/// Handles an OnClick event with the Pointer mode set.
 		/// </summary>
 		private void HandlePointerClick(EventArgs e)
 		{
 			selectedNode = hoveredNode;
+			if (selectedNode == MapNode.NoNode)
+				selectedEdge = hoveredEdge;
+			else
+				selectedEdge = null;
 			Refresh();
 		}
 
@@ -404,8 +596,7 @@ namespace TEN.Forms
 			{
 				if (clickedNodes.Count == 0)
 				{
-					// TO-DO: Setar fluxo.
-					FlowNode node = new FlowNode(adjustedMouseX, adjustedMouseY, 15);
+					FlowNode node = new FlowNode(adjustedMouseX, adjustedMouseY, TENApp.simulator.FlowValue);
 					TENApp.simulator.FlowNodes.Add(node);
 					clickedNodes.Add(node);
 				}
@@ -417,8 +608,8 @@ namespace TEN.Forms
 
 			if (clickedNodes.Count >= 2 && clickedNodes[0] != clickedNodes[1])
 			{
-				NumberDialog numberDialog = new NumberDialog();
-				DialogResult result = numberDialog.ShowDialog("New Road", "How many lanes will this road have?", "2");
+				NewRoadDialog numberDialog = new NewRoadDialog();
+				DialogResult result = numberDialog.ShowDialog();
 
 				// TO-DO: Verificar se usuário entrou int > 0.
 				if (result == DialogResult.OK)
@@ -428,12 +619,19 @@ namespace TEN.Forms
 					// Verifies if the destination node is a flow node.
 					if (to.GetType() == typeof(FlowNode))
 					{
-						// Removes it from the flow nodes list.
+						// Removes it from the flow nodes and general nodes list.
 						TENApp.simulator.FlowNodes.Remove((FlowNode)to);
-						to = new MapNode(to);
+						TENApp.simulator.Nodes.Remove(to);
+						MapNode newNode = new MapNode(to);
+						
+						// Remake all references of the flow node to a new equivalent non-flow node.
+						foreach (MapEdge edge in to.OutEdges)
+							edge.FromNode = to;
+
+						to = newNode;
 					}
 
-					#region Update map's size.
+					#region Update map's size
 					if (from.Point.X > mapWidth)
 						mapWidth = from.Point.X;
 					if (to.Point.X > mapWidth)
@@ -447,25 +645,28 @@ namespace TEN.Forms
 					// AutoScrollMinSize = new Size(mapWidth + mapExtraBoundings, mapHeight + mapExtraBoundings); 
 					#endregion
 
-					MapEdge mapEdge = new MapEdge(numberDialog.Response, from, to);
+					MapEdge mapEdge = new MapEdge(numberDialog.LanesNumber, from, to, numberDialog.MaxSpeed);
+
+					from.OutEdges.Add(mapEdge);
+					to.InEdges.Add(mapEdge);
+					if (!TENApp.simulator.Nodes.Contains(from))
+						TENApp.simulator.Nodes.Add(from);
+					if (!TENApp.simulator.Nodes.Contains(to))
+						TENApp.simulator.Nodes.Add(to);
+					TENApp.simulator.Edges.Add(mapEdge);
 
 					#region Trim edges as necessary
-					if (to.InEdges.Count == 0)
-					{
-						foreach (MapEdge edge in to.OutEdges)
-							edge.TrimFromEdge();
-					}
-					if (from.OutEdges.Count == 0)
-					{
-						foreach (MapEdge edge in from.InEdges)
-							edge.TrimToEdge();
-					} 
+					foreach (MapEdge edge in to.OutEdges)
+						edge.TrimFromEdge();
+
+					foreach (MapEdge edge in from.InEdges)
+						edge.TrimToEdge();
 					#endregion
 
 					#region Set ToLanes lists
 					foreach (MapEdge edge in to.OutEdges)
 					{
-						MapEdge cEdge = new MapEdge(Math.Min(edge.Lanes.Count, mapEdge.Lanes.Count), to, to);
+						MapEdge cEdge = new MapEdge(Math.Min(edge.Lanes.Count, mapEdge.Lanes.Count), to, to, mapEdge.MaximumSpeed);
 						for (int i = 0; i < edge.Lanes.Count && i < mapEdge.Lanes.Count; i++)
 						{
 							ConnectionLane cLane = new ConnectionLane(mapEdge.Lanes[i], edge.Lanes[i]);
@@ -473,11 +674,14 @@ namespace TEN.Forms
 							cEdge.Lanes[i] = cLane;
 							mapEdge.Lanes[i].ToLanes.Add(cLane);
 						}
+						edge.InConnections.Add(cEdge);
+						mapEdge.OutConnections.Add(cEdge);
+						edge.SetBoundings();
 						TENApp.simulator.ConnectionEdges.Add(cEdge);
 					}
 					foreach (MapEdge edge in from.InEdges)
 					{
-						MapEdge cEdge = new MapEdge(Math.Min(edge.Lanes.Count, mapEdge.Lanes.Count), to, to);
+						MapEdge cEdge = new MapEdge(Math.Min(edge.Lanes.Count, mapEdge.Lanes.Count), to, to, edge.MaximumSpeed);
 						for (int i = 0; i < edge.Lanes.Count && i < mapEdge.Lanes.Count; i++)
 						{
 							ConnectionLane cLane = new ConnectionLane(edge.Lanes[i], mapEdge.Lanes[i]);
@@ -485,25 +689,64 @@ namespace TEN.Forms
 							cEdge.Lanes[i] = cLane;
 							edge.Lanes[i].ToLanes.Add(cLane);
 						}
+						edge.OutConnections.Add(cEdge);
+						mapEdge.InConnections.Add(cEdge);
 						TENApp.simulator.ConnectionEdges.Add(cEdge);
 					}
+					mapEdge.SetBoundings();
 					#endregion
 
-					from.OutEdges.Add(mapEdge);
-					to.InEdges.Add(mapEdge);
-					TENApp.simulator.Nodes.Add(from);
-					TENApp.simulator.Nodes.Add(to);
-					TENApp.simulator.Edges.Add(mapEdge);
+					#region Verify if a semaphore refresh is needed
+					if (to.Semaphore != TEN.Structures.Semaphore.NoSemaphore)
+						to.Semaphore.RefreshNode();
+					#endregion
 				}
 				else
 				{
-					// TO-DO
 					// User cancelled.
+					if (clickedNodes[0].GetType() == typeof(FlowNode))
+					{
+						TENApp.simulator.FlowNodes.Remove((FlowNode)clickedNodes[0]);
+					}
 				}
 			}
 
 			if (clickedNodes.Count >= 2)
-				ClearClickedPoints();
+				ResetSelections();
+
+			Refresh();
+		}
+
+		/// <summary>
+		/// Handles an OnClick event with the NewTrafficLight mode set.
+		/// </summary>
+		private void HandleNewSemaphoreClick(EventArgs e)
+		{
+			MapNode node = hoveredNode;
+
+			if (node == MapNode.NoNode || node.Semaphore != TEN.Structures.Semaphore.NoSemaphore || node.InEdges.Count == 0)
+				return;
+
+			TEN.Structures.Semaphore semaphore = new TEN.Structures.Semaphore(node);
+			TENApp.simulator.Semaphores.Add(semaphore);
+			node.Semaphore = semaphore;
+
+			SemaphoreDialog dialog = new SemaphoreDialog(semaphore.CycleInterval,
+				semaphore.Temporization);
+			DialogResult result = dialog.ShowDialog();
+
+			if (result == DialogResult.OK)
+			{
+				semaphore.CycleInterval = dialog.CycleInterval;
+				semaphore.Temporization.Clear();
+				foreach (KeyValuePair<MapEdge, int> kvp in dialog.TemporizationCopy)
+					semaphore.Temporization.Add(kvp);
+			}
+			else
+			{
+				node.Semaphore = null;
+				TENApp.simulator.Semaphores.Remove(semaphore);
+			}
 
 			Refresh();
 		}
@@ -519,8 +762,8 @@ namespace TEN.Forms
 
 			// Map transformations.
 			pe.Graphics.PageUnit = GraphicsUnit.Pixel;
-			pe.Graphics.PageScale = zoom;
 			pe.Graphics.TranslateTransform(AutoScrollPosition.X, AutoScrollPosition.Y);
+			pe.Graphics.PageScale = zoom;
 
 			RenderMap(pe.Graphics);
 		}
@@ -553,6 +796,7 @@ namespace TEN.Forms
 					break;
 
 				case AppState.EditingNewTrafficLight:
+					HandleNewSemaphoreClick(e);
 					break;
 			}
 		}
