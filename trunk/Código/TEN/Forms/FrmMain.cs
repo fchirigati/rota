@@ -84,7 +84,7 @@ namespace TEN.Forms
 					pauseToolStripMenuItem.Enabled = true;
 					stopToolStripMenuItem1.Enabled = true;
 					restartToolStripMenuItem1.Enabled = true;
-					reportToolStripMenuItem.Enabled = false;
+					lastSimulationToolStripMenuItem.Enabled = false;
 					optionsToolStripMenuItem1.Enabled = false;
 
 					btnNewRoad.Enabled = false;
@@ -114,7 +114,7 @@ namespace TEN.Forms
 					pauseToolStripMenuItem.Enabled = false;
 					stopToolStripMenuItem1.Enabled = true;
 					restartToolStripMenuItem1.Enabled = true;
-					reportToolStripMenuItem.Enabled = true;
+					lastSimulationToolStripMenuItem.Enabled = true;
 					optionsToolStripMenuItem1.Enabled = true;
 
 					btnNewRoad.Enabled = false;
@@ -144,7 +144,7 @@ namespace TEN.Forms
 					pauseToolStripMenuItem.Enabled = false;
 					stopToolStripMenuItem1.Enabled = false;
 					restartToolStripMenuItem1.Enabled = false;
-					reportToolStripMenuItem.Enabled = false;
+					lastSimulationToolStripMenuItem.Enabled = false;
 					optionsToolStripMenuItem1.Enabled = true;
 
 					btnPointer.Enabled = true;
