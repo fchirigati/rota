@@ -34,6 +34,11 @@ namespace TEN.Forms
 		/// Previous selected index. Refreshed when changing indexes.
 		/// </summary>
 		private int previousIndex;
+
+		/// <summary>
+		/// States if the user clicked the cancel button.
+		/// </summary>
+		private bool cancelled;
 		#endregion
 
 		#region Constructors
@@ -56,6 +61,7 @@ namespace TEN.Forms
 			this.listSemaphores.SelectedIndex = 0;
 			this.previousIndex = 0;
 			this.cycleInterval.Focus();
+			this.cancelled = false;
 		}
 		#endregion
 
@@ -74,8 +80,9 @@ namespace TEN.Forms
 		{
 			KeyValuePair<MapEdge, int> kvp = temporizationCopy[previousIndex];
 			int newTime = kvp.Value;
-			int.TryParse(greenTime.Text, out newTime);
-			temporizationCopy[previousIndex] = new KeyValuePair<MapEdge, int>(kvp.Key, newTime);
+			if (int.TryParse(greenTime.Text, out newTime) && newTime > 0)
+				temporizationCopy[previousIndex] = new KeyValuePair<MapEdge, int>(kvp.Key, newTime);
+
 			greenTime.Text = temporizationCopy[listSemaphores.SelectedIndex].Value.ToString();
 			TENApp.frmMain.Drawer.SelectedEdge = temporizationCopy[listSemaphores.SelectedIndex].Key;
 			TENApp.frmMain.Drawer.Refresh();
@@ -85,12 +92,27 @@ namespace TEN.Forms
 
 		private void SemaphoreDialog_FormClosing(object sender, FormClosingEventArgs e)
 		{
+			if (e.CloseReason == CloseReason.UserClosing || cancelled)
+				return;
+
 			KeyValuePair<MapEdge, int> kvp = temporizationCopy[previousIndex];
 			int newTime = kvp.Value;
-			int.TryParse(greenTime.Text, out newTime);
-			temporizationCopy[previousIndex] = new KeyValuePair<MapEdge, int>(kvp.Key, newTime);
+			if (int.TryParse(greenTime.Text, out newTime) && newTime > 0)
+				temporizationCopy[previousIndex] = new KeyValuePair<MapEdge, int>(kvp.Key, newTime);
+
+			int value;
+			if (!int.TryParse(cycleInterval.Text, out value) || value < 0)
+			{
+				e.Cancel = true;
+				MessageBox.Show("Invalid input value.", "TEN - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
 
 			TENApp.frmMain.Drawer.SelectedEdge = null;
+		}
+
+		private void btnCancel_Click(object sender, EventArgs e)
+		{
+			cancelled = true;
 		}
 		#endregion
 	}

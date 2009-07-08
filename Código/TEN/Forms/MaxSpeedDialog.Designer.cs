@@ -76,6 +76,7 @@
 			this.btnCancel.TabIndex = 5;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
+			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 			// 
 			// label2
 			// 
@@ -86,7 +87,7 @@
 			this.label2.TabIndex = 6;
 			this.label2.Text = "km/h";
 			// 
-			// NewRoadDialog
+			// MaxSpeedDialog
 			// 
 			this.AcceptButton = this.btnOk;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -102,12 +103,13 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "NewRoadDialog";
+			this.Name = "MaxSpeedDialog";
 			this.Padding = new System.Windows.Forms.Padding(0, 0, 0, 10);
 			this.ShowIcon = false;
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Maximum Speed";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MaxSpeedDialog_FormClosing);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

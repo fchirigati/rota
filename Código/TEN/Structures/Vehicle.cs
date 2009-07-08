@@ -81,6 +81,24 @@ namespace TEN.Structures
 			get { return position; }
 			set { position = value; }
 		}
+
+		private float totalDistance;
+		/// <summary>
+		/// Total distance percurred by this vehicle.
+		/// </summary>
+		public float TotalDistance
+		{
+			get { return totalDistance; }
+		}
+
+		private uint totalSteps;
+		/// <summary>
+		/// Number of simulation steps that this vehicle has done since its creation.
+		/// </summary>
+		public uint TotalSteps
+		{
+			get { return totalSteps; }
+		}
 		#endregion
 
 		#region Constructors
@@ -97,6 +115,8 @@ namespace TEN.Structures
 			this.color = vehicleColor;
 			this.lane = currentLane;
 			this.position = 0;
+			this.totalDistance = 0;
+			this.totalSteps = 0;
 		}
 		#endregion
 
@@ -109,6 +129,8 @@ namespace TEN.Structures
 		public void SimulationStep(int simulationStep, Vehicle nextVehicle)
 		{
 			position += (speed * simulationStep) * 0.001F;
+			totalDistance += (speed * simulationStep) * 0.001F;
+			totalSteps++;
 
 			MapNode toNode = lane.Edge.ToNode;
 			bool canIncreaseSpeed = true;
@@ -120,7 +142,6 @@ namespace TEN.Structures
 				float distance = nextVehicle.Position - position - length;
 				float warningDistance = Math.Max(speed * TENApp.simulator.SafetyDistance * 0.1F,
 					TENApp.simulator.SafetyDistance);
-				//if (2 * distance * deceleration <= speed * speed - nextVehicle.Speed * nextVehicle.Speed)
 				if (distance <= warningDistance)
 				{
 					if (distance < TENApp.simulator.SafetyDistance || speed > nextVehicle.Speed)
@@ -242,6 +263,8 @@ namespace TEN.Structures
 				if (lane.ToLanes.Count == 0)
 				{
 					// A final node has been reached.
+					TENApp.simulator.CarsOut++;
+					TENApp.simulator.AverageSpeedSum += 1000 * totalDistance / (totalSteps * TENApp.simulator.SimulationStepTime);
 				}
 				else
 				{

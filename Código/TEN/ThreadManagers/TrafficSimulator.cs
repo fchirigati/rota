@@ -97,6 +97,48 @@ namespace TEN
 			set { simulationDelay = value; }
 		}
 
+		#region Report Data
+		private int carsOut;
+		/// <summary>
+		/// Number of cars that were removed from the simulation by reaching an end node.
+		/// </summary>
+		public int CarsOut
+		{
+			get { return carsOut; }
+			set { carsOut = value; }
+		}
+
+		private float averageSpeedSum;
+		/// <summary>
+		/// Sum of average speed of the cars that were removed from the simulation.
+		/// </summary>
+		public float AverageSpeedSum
+		{
+			get { return averageSpeedSum; }
+			set { averageSpeedSum = value; }
+		}
+
+		private DateTime simulationStartTime;
+		/// <summary>
+		/// Simulation start time.
+		/// </summary>
+		public DateTime SimulationStartTime
+		{
+			get { return simulationStartTime; }
+			set { simulationStartTime = value; }
+		}
+
+		private DateTime simulationEndTime;
+		/// <summary>
+		/// Simulation end time.
+		/// </summary>
+		public DateTime SimulationEndTime
+		{
+			get { return simulationEndTime; }
+			set { simulationEndTime = value; }
+		}
+		#endregion
+
 		#region Map Data
 		private List<MapEdge> edges;
 		/// <summary>
@@ -144,6 +186,7 @@ namespace TEN
 		}
 		#endregion
 
+		#region Parameters
 		private int safetyDistance;
 		/// <summary>
 		/// Gets or sets the safety distance between vehicles.
@@ -174,6 +217,7 @@ namespace TEN
 			set { flowValue = value; }
 		}
 		#endregion
+		#endregion
 
 		#region Constructors
 		/// <summary>
@@ -195,6 +239,10 @@ namespace TEN
 			this.safetyDistance = DefaultSafetyDistance;
 			this.warningSpeed = DefaultWarningSpeed;
 			this.flowValue = DefaultFlowValue;
+			this.carsOut = 0;
+			this.averageSpeedSum = 0;
+			this.simulationStartTime = new DateTime();
+			this.simulationEndTime = new DateTime();
 		}
 		#endregion
 
@@ -234,6 +282,9 @@ namespace TEN
 				return;
 
 			isSimulating = true;
+			simulationStartTime = DateTime.Now;
+			carsOut = 0;
+			averageSpeedSum = 0;
 		}
 		
 		/// <summary>
@@ -246,7 +297,24 @@ namespace TEN
 
 			isSimulating = false;
 
-			// TO-DO: Encapsular em métodos de Reset.
+			simulationEndTime = DateTime.Now;
+			List<MapEdge> allEdges = new List<MapEdge>(edges);
+			allEdges.AddRange(connectionEdges);
+
+			foreach (MapEdge edge in allEdges)
+			{
+				foreach (Lane lane in edge.Lanes)
+				{
+					lock (lane.Vehicles)
+					{
+						carsOut += lane.Vehicles.Count;
+
+						foreach (Vehicle vehicle in lane.Vehicles)
+							averageSpeedSum += 1000 * vehicle.TotalDistance / (vehicle.TotalSteps * simulationStepTime);
+					}
+				}
+			}
+
 			Reset();
 		}
 
@@ -259,6 +327,7 @@ namespace TEN
 				return;
 
 			isSimulating = false;
+			simulationEndTime = DateTime.Now;
 		}
 
 		/// <summary>
@@ -346,6 +415,7 @@ namespace TEN
 			}
 
 			TENApp.frmMain.Drawer.SelectedEdge = null;
+			TENApp.frmMain.Drawer.HoveredEdge = null;
 		}
 
 		/// <summary>

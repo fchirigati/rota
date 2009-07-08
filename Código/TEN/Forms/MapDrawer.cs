@@ -134,10 +134,15 @@ namespace TEN.Forms
 			get { return selectedNode; }
 		}
 
+		private MapEdge hoveredEdge;
 		/// <summary>
 		/// Reference to the current hovered edge. null if there are no hovered edges.
 		/// </summary>
-		private MapEdge hoveredEdge;
+		public MapEdge HoveredEdge
+		{
+			get { return hoveredEdge; }
+			set { hoveredEdge = value; }
+		}
 
 		private MapEdge selectedEdge;
 		/// <summary>
@@ -232,7 +237,7 @@ namespace TEN.Forms
 		}
 
 		/// <summary>
-		/// Method called to configure the selected item or the general settings if no items are selected.
+		/// Method called to configure the selected item.
 		/// </summary>
 		public void Configure()
 		{
@@ -264,6 +269,74 @@ namespace TEN.Forms
 					selectedEdge.MaximumSpeed = dialog.MaxSpeed;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Method called to configure the the general parameters.
+		/// </summary>
+		public void SetParameters()
+		{
+			ParametersDialog dialog = new ParametersDialog(TENApp.simulator.FlowValue,
+				TENApp.simulator.SafetyDistance, TENApp.simulator.SimulationStepTime);
+			DialogResult result = dialog.ShowDialog();
+
+			if (result == DialogResult.OK)
+			{
+				TENApp.simulator.FlowValue = dialog.Flow;
+				TENApp.simulator.SafetyDistance = dialog.SafetyDistance;
+				TENApp.simulator.SimulationStepTime = dialog.SimulationStep;
+				foreach (FlowNode flowNode in TENApp.simulator.FlowNodes)
+					flowNode.Flow = TENApp.simulator.FlowValue;
+			}
+		}
+
+		/// <summary>
+		/// Shows the report dialog.
+		/// </summary>
+		public void ShowReport()
+		{
+			int numberOfCars = TENApp.simulator.CarsOut;
+			float totalAverageSpeed = TENApp.simulator.AverageSpeedSum;
+			List<MapEdge> allEdges = new List<MapEdge>(TENApp.simulator.Edges);
+			allEdges.AddRange(TENApp.simulator.ConnectionEdges);
+
+			foreach (MapEdge edge in allEdges)
+			{
+				foreach (Lane lane in edge.Lanes)
+				{
+					lock (lane.Vehicles)
+					{
+						numberOfCars += lane.Vehicles.Count;
+
+						foreach (Vehicle vehicle in lane.Vehicles)
+							totalAverageSpeed += 1000 * vehicle.TotalDistance / (vehicle.TotalSteps * TENApp.simulator.SimulationStepTime);
+					}
+				}
+			}
+			totalAverageSpeed /= numberOfCars;
+
+			string report = "SIMULATION REPORT" + Environment.NewLine;
+			report += "--------------------------------" + Environment.NewLine;
+			report += Environment.NewLine;
+			report += "\tStart time:\t" + TENApp.simulator.SimulationStartTime.ToString("dd-MM-yyyy HH:mm:ss") + Environment.NewLine;
+			report += "\tEnd time:\t" + TENApp.simulator.SimulationEndTime.ToString("dd-MM-yyyy HH:mm:ss") + Environment.NewLine;
+			report += Environment.NewLine;
+			report += "\tMap Info:" + Environment.NewLine;
+			report += "\t  . Number of roads: " + TENApp.simulator.Edges.Count + Environment.NewLine;
+			report += "\t  . Number of semaphores: " + TENApp.simulator.Semaphores.Count + Environment.NewLine;
+			report += "\t  . Flow: " + TENApp.simulator.FlowValue + " cars/minute" + Environment.NewLine;
+			report += "\t  . Safety Distance: " + TENApp.simulator.SafetyDistance * 0.1 + " meters" + Environment.NewLine;
+			report += "\t  . Simulation Step: " + TENApp.simulator.SimulationStepTime + " units" + Environment.NewLine;
+			report += Environment.NewLine;
+			report += "\tNumber of paused times: " + Environment.NewLine;
+			report += Environment.NewLine;
+			report += "\tSimulation Info:" + Environment.NewLine;
+			report += "\t  . Average Speed: " + totalAverageSpeed + Environment.NewLine;
+			report += "\t  . Number of Cars:" + numberOfCars + Environment.NewLine;
+			report += Environment.NewLine;
+			
+			ReportDialog dialog = new ReportDialog(report);
+			dialog.ShowDialog();
 		}
 		#endregion
 
