@@ -1,0 +1,1 @@
+Este software busca otimizar os sinais de trânsito de um local a partir de dados de tráfego em tempo-real.
